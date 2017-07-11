@@ -1,1 +1,1 @@
-# wallpaper-dl
+# Reddit Image Downloader
