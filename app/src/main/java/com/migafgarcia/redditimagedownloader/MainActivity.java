@@ -46,10 +46,11 @@ public class MainActivity extends Activity {
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
+        /*
         DividerItemDecoration mDividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
                 DividerItemDecoration.VERTICAL);
         recyclerView.addItemDecoration(mDividerItemDecoration);
-
+*/
 
         service.getList(getString(R.string.multireddit)).enqueue(new Controller(getApplicationContext(), recyclerView));
 

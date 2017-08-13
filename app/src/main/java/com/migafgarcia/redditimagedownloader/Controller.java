@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.migafgarcia.redditimagedownloader.adapters.ListAdapter;
@@ -19,6 +20,9 @@ import retrofit2.Response;
  */
 
 public class Controller implements Callback<RedditResponse> {
+
+    public static final String TAG = "Controller";
+
     private Context mContext;
     private RecyclerView recyclerView;
 
@@ -31,7 +35,7 @@ public class Controller implements Callback<RedditResponse> {
     public void onResponse(Call<RedditResponse> call, Response<RedditResponse> response) {
         processPosts(response.body());
 
-        recyclerView.swapAdapter(new ListAdapter(mContext, response.body().data.posts), true);
+        recyclerView.swapAdapter(new ListAdapter(mContext, response.body().data.posts), false);
 
 
     }
@@ -39,6 +43,8 @@ public class Controller implements Callback<RedditResponse> {
     @Override
     public void onFailure(Call<RedditResponse> call, Throwable t) {
         Toast.makeText(mContext, t.getMessage(), Toast.LENGTH_LONG).show();
+        Log.d(TAG, t.toString());
+        Log.d(TAG, call.toString());
     }
 
     private void processPosts(RedditResponse response) {
