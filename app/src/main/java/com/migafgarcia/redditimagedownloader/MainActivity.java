@@ -1,29 +1,38 @@
 package com.migafgarcia.redditimagedownloader;
 
-import android.support.v7.app.AppCompatActivity;
+import android.app.Activity;
 import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
-import com.migafgarcia.redditimagedownloader.data.Child;
-import com.migafgarcia.redditimagedownloader.data.ListItem;
+import com.migafgarcia.redditimagedownloader.adapters.ListAdapter;
+import com.migafgarcia.redditimagedownloader.data.Post;
 import com.migafgarcia.redditimagedownloader.services.RedditService;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import java.util.ArrayList;
+
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
 
     public static final String TAG = "MainActivity";
+
+    private RecyclerView recyclerView;
+    private RecyclerView.LayoutManager mLayoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        recyclerView = (RecyclerView) findViewById(R.id.main_recyclerview);
+
         Log.i(TAG, "HELLO");
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://reddit.com/")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -31,22 +40,18 @@ public class MainActivity extends AppCompatActivity {
 
         RedditService service = retrofit.create(RedditService.class);
 
-        service.getList(getString(R.string.multireddit)).enqueue(new Callback<ListItem>() {
-            @Override
-            public void onResponse(Call<ListItem> call, Response<ListItem> response) {
-                ListItem res = response.body();
 
-                for(Child c : res.data.children) {
-                    Log.i(TAG, c.data.subreddit);
-                }
+        recyclerView.setAdapter(new ListAdapter(getApplicationContext(), new ArrayList<Post>(0)));
+        mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-            }
+        DividerItemDecoration mDividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
+                DividerItemDecoration.VERTICAL);
+        recyclerView.addItemDecoration(mDividerItemDecoration);
 
-            @Override
-            public void onFailure(Call<ListItem> call, Throwable t) {
-                Log.e(TAG, t.getMessage());
-            }
-        });
+
+        service.getList(getString(R.string.multireddit)).enqueue(new Controller(getApplicationContext(), recyclerView));
 
 
 

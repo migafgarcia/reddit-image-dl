@@ -11,7 +11,7 @@ public class Data {
     public String modhash;
     @SerializedName("children")
     @Expose
-    public List<Child> children = null;
+    public List<Post> posts = null;
     @SerializedName("after")
     @Expose
     public String after;

@@ -3,13 +3,13 @@ package com.migafgarcia.redditimagedownloader.data;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class ListItem {
+public class Post {
 
     @SerializedName("kind")
     @Expose
     public String kind;
     @SerializedName("data")
     @Expose
-    public Data data;
+    public Data_ data;
 
 }
