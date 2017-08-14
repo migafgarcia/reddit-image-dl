@@ -1,10 +1,9 @@
 <resources>
     <string name="app_name">Reddit Image Downloader</string>
     <string name="preview_content_description">Preview of the original image</string>
-    <!-- <string name="multireddit">EarthPorn+BotanicalPorn+WaterPorn+SeaPorn+SkyPorn+FirePorn+DesertPorn+WinterPorn+AutumnPorn+WeatherPorn+GeologyPorn+SpacePorn+BeachPorn+MushroomPorn+SpringPorn+SummerPorn+LavaPorn+LakePorn+CityPorn+VillagePorn+RuralPorn+ArchitecturePorn+HousePorn+CabinPorn+ChurchPorn+AbandonedPorn+CemeteryPorn+InfrastructurePorn+MachinePorn+CarPorn+F1Porn+MotorcyclePorn+MilitaryPorn+GunPorn+KnifePorn+BoatPorn+RidesPorn+DestructionPorn+ThingsCutInHalfPorn+StarshipPorn+ToolPorn+TechnologyPorn+BridgePorn+PolicePorn+SteamPorn+RetailPorn+SpaceFlightPorn+roadporn+drydockporn+AnimalPorn+HumanPorn+EarthlingPorn+AdrenalinePorn+ClimbingPorn+SportsPorn+AgriculturePorn+TeaPorn+BonsaiPorn+FoodPorn+CulinaryPorn+DessertPorn+DesignPorn+RoomPorn+AlbumArtPorn+MetalPorn+MoviePosterPorn+TelevisionPosterPorn+ComicBookPorn+StreetArtPorn+AdPorn+ArtPorn+FractalPorn+InstrumentPorn+ExposurePorn+MacroPorn+MicroPorn+GeekPorn+MTGPorn+GamerPorn+PowerWashingPorn+AerialPorn+OrganizationPorn+FashionPorn+AVPorn+ApocalypsePorn+InfraredPorn+ViewPorn+HellscapePorn+sculptureporn+HistoryPorn+UniformPorn+BookPorn+NewsPorn+QuotesPorn+FuturePorn+FossilPorn+MegalithPorn+ArtefactPorn</string> -->
-    <!-- <string name="multireddit">topwalls+wallpaper+minimalisticwalls+ComicWalls</string> -->
-    <string name="multireddit">wallpaper</string>
+    <string name="multireddit">EarthPorn+CityPorn+SkyPorn+WeatherPorn+BotanicalPorn+LakePorn+VillagePorn+BeachPorn+WaterPorn+SpacePorn+multiwall+wallpapers+wallpaper+offensive_wallpapers+nocontext_wallpapers</string>
 
     <string name="user_prefix">/u/</string>
     <string name="subreddit_prefix">/r/</string>
+    <string name="reddit_base_url">https://reddit.com/</string>
 </resources>

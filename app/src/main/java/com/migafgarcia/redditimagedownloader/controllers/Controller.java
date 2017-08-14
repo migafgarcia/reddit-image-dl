@@ -1,9 +1,6 @@
-package com.migafgarcia.redditimagedownloader;
+package com.migafgarcia.redditimagedownloader.controllers;
 
 import android.content.Context;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -11,33 +8,30 @@ import com.migafgarcia.redditimagedownloader.adapters.ListAdapter;
 import com.migafgarcia.redditimagedownloader.data.Post;
 import com.migafgarcia.redditimagedownloader.data.RedditResponse;
 
+import java.util.Iterator;
+import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-/**
- * Created by mgarcia on 13-08-2017.
- */
 
 public class Controller implements Callback<RedditResponse> {
 
     public static final String TAG = "Controller";
 
     private Context mContext;
-    private RecyclerView recyclerView;
+    private ListAdapter adapter;
 
-    public Controller(Context context, RecyclerView recyclerView) {
+    public Controller(Context context, ListAdapter adapter) {
         this.mContext = context;
-        this.recyclerView = recyclerView;
+        this.adapter = adapter;
     }
 
     @Override
     public void onResponse(Call<RedditResponse> call, Response<RedditResponse> response) {
         processPosts(response.body());
-
-        recyclerView.swapAdapter(new ListAdapter(mContext, response.body().data.posts), false);
-
-
+        adapter.updatePosts(response.body());
     }
 
     @Override
@@ -49,7 +43,18 @@ public class Controller implements Callback<RedditResponse> {
 
     private void processPosts(RedditResponse response) {
 
-        // TODO: 13-08-2017
+        List<Post> posts = response.data.posts;
+
+        Iterator<Post> itr = posts.iterator();
+
+        while(itr.hasNext()) {
+            Post curr = itr.next();
+
+            if(curr.data.postHint == null || !curr.data.postHint.equals("image")) {
+                itr.remove();
+                Log.d(TAG, "Item removed");
+            }
+        }
 
     }
 }
