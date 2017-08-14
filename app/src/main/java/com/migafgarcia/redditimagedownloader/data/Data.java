@@ -8,15 +8,33 @@ public class Data {
 
     @SerializedName("modhash")
     @Expose
-    public String modhash;
+    private String modhash;
+
     @SerializedName("children")
     @Expose
-    public List<Post> posts = null;
+    private List<Post> posts = null;
+
     @SerializedName("after")
     @Expose
-    public String after;
+    private String after;
+
     @SerializedName("before")
     @Expose
-    public Object before;
+    private Object before;
 
+    public String getModhash() {
+        return modhash;
+    }
+
+    public List<Post> getPosts() {
+        return posts;
+    }
+
+    public String getAfter() {
+        return after;
+    }
+
+    public Object getBefore() {
+        return before;
+    }
 }

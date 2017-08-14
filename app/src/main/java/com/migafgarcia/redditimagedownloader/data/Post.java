@@ -7,9 +7,17 @@ public class Post {
 
     @SerializedName("kind")
     @Expose
-    public String kind;
+    private String kind;
+
     @SerializedName("data")
     @Expose
-    public Data_ data;
+    private Data_ data;
 
+    public String getKind() {
+        return kind;
+    }
+
+    public Data_ getData() {
+        return data;
+    }
 }

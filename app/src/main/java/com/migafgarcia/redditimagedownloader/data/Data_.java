@@ -9,65 +9,137 @@ public class Data_ {
 
     @SerializedName("thumbnail_width")
     @Expose
-    public Integer thumbnailWidth;
+    private Integer thumbnailWidth;
 
     @SerializedName("subreddit")
     @Expose
-    public String subreddit;
+    private String subreddit;
 
     @SerializedName("id")
     @Expose
-    public String id;
+    private String id;
 
     @SerializedName("title")
     @Expose
-    public String title;
+    private String title;
 
     @SerializedName("score")
     @Expose
-    public String score;
+    private String score;
 
     @SerializedName("over_18")
     @Expose
-    public Boolean over18;
+    private Boolean over18;
 
     @SerializedName("thumbnail")
     @Expose
-    public String thumbnail;
+    private String thumbnail;
 
     @SerializedName("subreddit_id")
     @Expose
-    public String subredditId;
+    private String subredditId;
 
     @SerializedName("post_hint")
     @Expose
-    public String postHint;
+    private String postHint;
 
     @SerializedName("thumbnail_height")
     @Expose
-    public Integer thumbnailHeight;
+    private Integer thumbnailHeight;
 
     @SerializedName("permalink")
     @Expose
-    public String permalink;
+    private String permalink;
 
     @SerializedName("locked")
     @Expose
-    public Boolean locked;
+    private Boolean locked;
 
     @SerializedName("created")
     @Expose
-    public Float created;
+    private Float created;
 
     @SerializedName("url")
     @Expose
-    public String url;
+    private String url;
 
     @SerializedName("author")
     @Expose
-    public String author;
+    private String author;
 
     @SerializedName("created_utc")
     @Expose
-    public Float createdUtc;
+    private Float createdUtc;
+
+    @SerializedName("preview")
+    @Expose
+    private Preview preview;
+
+    public Integer getThumbnailWidth() {
+        return thumbnailWidth;
+    }
+
+    public String getSubreddit() {
+        return subreddit;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getScore() {
+        return score;
+    }
+
+    public Boolean getOver18() {
+        return over18;
+    }
+
+    public String getThumbnail() {
+        return thumbnail;
+    }
+
+    public String getSubredditId() {
+        return subredditId;
+    }
+
+    public String getPostHint() {
+        return postHint;
+    }
+
+    public Integer getThumbnailHeight() {
+        return thumbnailHeight;
+    }
+
+    public String getPermalink() {
+        return permalink;
+    }
+
+    public Boolean getLocked() {
+        return locked;
+    }
+
+    public Float getCreated() {
+        return created;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public Float getCreatedUtc() {
+        return createdUtc;
+    }
+
+    public Preview getPreview() {
+        return preview;
+    }
 }

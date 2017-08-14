@@ -43,14 +43,14 @@ public class Controller implements Callback<RedditResponse> {
 
     private void processPosts(RedditResponse response) {
 
-        List<Post> posts = response.data.posts;
+        List<Post> posts = response.getData().getPosts();
 
         Iterator<Post> itr = posts.iterator();
 
         while(itr.hasNext()) {
             Post curr = itr.next();
 
-            if(curr.data.postHint == null || !curr.data.postHint.equals("image")) {
+            if(curr.getData().getPostHint() == null || !curr.getData().getPostHint().equals("image")) {
                 itr.remove();
                 Log.d(TAG, "Item removed");
             }

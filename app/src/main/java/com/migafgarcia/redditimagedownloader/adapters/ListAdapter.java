@@ -1,6 +1,7 @@
 package com.migafgarcia.redditimagedownloader.adapters;
 
 import android.content.Context;
+import android.graphics.drawable.GradientDrawable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,6 +15,9 @@ import com.migafgarcia.redditimagedownloader.data.RedditResponse;
 import com.migafgarcia.redditimagedownloader.services.RedditService;
 import com.squareup.picasso.Picasso;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -54,14 +58,19 @@ public class ListAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
     @Override
     public void onBindViewHolder(ListItemViewHolder holder, int position) {
 
-        if (position == getItemCount() - 1) {
+        Post post = posts.get(position);
+
+        if (position == getItemCount() - 1 && getItemCount() > 0) {
             service.getListAfter(context.getString(R.string.multireddit), after).enqueue(new Controller(context, this));
         }
 
-        holder.title.setText(posts.get(position).data.title);
-        holder.subreddit.setText(posts.get(position).data.subreddit);
-        holder.user.setText(posts.get(position).data.author);
-        Picasso.with(context).load(posts.get(position).data.thumbnail).into(holder.preview);
+        holder.title.setText(post.getData().getTitle());
+        holder.subreddit.setText(post.getData().getSubreddit());
+        holder.user.setText(post.getData().getAuthor());
+
+        Picasso.with(context).load(post.getData().getThumbnail()).placeholder(R.color.cardview_dark_background).into(holder.preview);
+
+
     }
 
     @Override
@@ -70,9 +79,8 @@ public class ListAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
     }
 
     public void updatePosts(RedditResponse response) {
-        posts.addAll(response.data.posts);
-        after = response.data.after;
-        Log.d(TAG, "After = " + response.data.after);
+        posts.addAll(response.getData().getPosts());
+        after = response.getData().getAfter();
         notifyDataSetChanged();
     }
 

@@ -4,6 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    android:clickable="true"
     android:orientation="vertical"
     app:cardElevation="8dp">
 
@@ -17,6 +19,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
+            android:background="@color/cardview_dark_background"
             android:scaleType="centerCrop"
             android:src="@android:drawable/ic_menu_report_image"
             app:layout_constraintHorizontal_bias="0.0"

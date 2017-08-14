@@ -7,9 +7,17 @@ public class RedditResponse {
 
     @SerializedName("kind")
     @Expose
-    public String kind;
+    private String kind;
+
     @SerializedName("data")
     @Expose
-    public Data data;
+    private Data data;
 
+    public String getKind() {
+        return kind;
+    }
+
+    public Data getData() {
+        return data;
+    }
 }
