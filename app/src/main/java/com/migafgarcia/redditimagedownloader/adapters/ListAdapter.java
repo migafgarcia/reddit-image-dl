@@ -1,6 +1,7 @@
 package com.migafgarcia.redditimagedownloader.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
@@ -18,18 +19,13 @@ import com.migafgarcia.redditimagedownloader.data.Resolution;
 import com.migafgarcia.redditimagedownloader.services.RedditService;
 import com.squareup.picasso.Picasso;
 
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
 public class ListAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
 
@@ -64,7 +60,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
     @Override
     public void onBindViewHolder(ListItemViewHolder holder, int position) {
 
-        Post post = posts.get(position);
+        final Post post = posts.get(position);
 
         if (position == getItemCount() - 1 && getItemCount() > 0)
             service.getListAfter(context.getString(R.string.multireddit), after).
@@ -77,11 +73,9 @@ public class ListAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
         if(post.getData().getPreview().getEnabled()) {
             List<Resolution> resolutions = post.getData().getPreview().getImages().get(0).getResolutions();
 
-            int index = resolutionIndex(resolutions);
 
-            Log.d(TAG, Html.fromHtml(resolutions.get(resolutions.size() - 1).getUrl()).toString());
             Picasso.with(context).
-                    load(Html.fromHtml(resolutions.get(resolutions.size() - 1).getUrl()).toString()).
+                    load(Html.fromHtml(resolutions.get(resolutions.size() - 1).getUrl()).toString()). // TODO: 15-08-2017
                     placeholder(R.color.cardview_dark_background).
                     resize(resolutions.get(resolutions.size() - 1).getWidth(), resolutions.get(resolutions.size() - 1).getHeight()).
                     into(holder.preview);
@@ -93,10 +87,17 @@ public class ListAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
                     resize(post.getData().getThumbnailWidth(), post.getData().getThumbnailHeight()).
                     placeholder(R.color.cardview_dark_background).
                     into(holder.preview);
-    }
 
-    private int resolutionIndex(List<Resolution> resolutions) {
-        return 0;
+
+        holder.preview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(post.getData().getUrl()));
+                i.setFlags(FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(i);
+            }
+        });
     }
 
     @Override
@@ -109,5 +110,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
         after = response.getData().getAfter();
         notifyDataSetChanged();
     }
+
+
 
 }
