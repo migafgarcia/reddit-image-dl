@@ -1,4 +1,4 @@
-package com.migafgarcia.redditimagedownloader.data;
+package com.migafgarcia.redditimagedownloader.reddit_json;
 
 
 import com.google.gson.annotations.Expose;

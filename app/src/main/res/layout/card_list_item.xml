@@ -13,7 +13,7 @@
     android:clickable="true">
 
     <ImageView
-        android:id="@+id/preview_imageview"
+        android:id="@+id/thumbnail_imageview"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:adjustViewBounds="true"
@@ -36,9 +36,9 @@
         android:textAlignment="center"
         android:textColor="@color/cardview_light_background"
         android:textSize="@dimen/title_text_size"
-        app:layout_constraintLeft_toLeftOf="@+id/preview_imageview"
-        app:layout_constraintRight_toRightOf="@+id/preview_imageview"
-        app:layout_constraintTop_toTopOf="@+id/preview_imageview"
+        app:layout_constraintLeft_toLeftOf="@+id/thumbnail_imageview"
+        app:layout_constraintRight_toRightOf="@+id/thumbnail_imageview"
+        app:layout_constraintTop_toTopOf="@+id/thumbnail_imageview"
         tools:text="sdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdssa" />
 
 
@@ -48,9 +48,9 @@
         android:clickable="true"
         android:columnCount="2"
         android:rowCount="1"
-        app:layout_constraintBottom_toBottomOf="@+id/preview_imageview"
-        app:layout_constraintLeft_toLeftOf="@+id/preview_imageview"
-        app:layout_constraintRight_toRightOf="@+id/preview_imageview">
+        app:layout_constraintBottom_toBottomOf="@+id/thumbnail_imageview"
+        app:layout_constraintLeft_toLeftOf="@+id/thumbnail_imageview"
+        app:layout_constraintRight_toRightOf="@+id/thumbnail_imageview">
 
         <TextView
             android:id="@+id/subreddit_textview"

@@ -8,14 +8,6 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
 import com.migafgarcia.redditimagedownloader.adapters.ListAdapter;
-import com.migafgarcia.redditimagedownloader.controllers.Controller;
-import com.migafgarcia.redditimagedownloader.data.Post;
-import com.migafgarcia.redditimagedownloader.services.RedditService;
-
-import java.util.ArrayList;
-
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends Activity {
 

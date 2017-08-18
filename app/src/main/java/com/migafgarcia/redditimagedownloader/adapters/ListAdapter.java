@@ -2,7 +2,7 @@ package com.migafgarcia.redditimagedownloader.adapters;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.GradientDrawable;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
@@ -13,9 +13,9 @@ import android.view.ViewGroup;
 
 import com.migafgarcia.redditimagedownloader.R;
 import com.migafgarcia.redditimagedownloader.controllers.Controller;
-import com.migafgarcia.redditimagedownloader.data.Post;
-import com.migafgarcia.redditimagedownloader.data.RedditResponse;
-import com.migafgarcia.redditimagedownloader.data.Resolution;
+import com.migafgarcia.redditimagedownloader.reddit_json.Post;
+import com.migafgarcia.redditimagedownloader.reddit_json.RedditResponse;
+import com.migafgarcia.redditimagedownloader.reddit_json.Resolution;
 import com.migafgarcia.redditimagedownloader.services.RedditService;
 import com.squareup.picasso.Picasso;
 
@@ -70,25 +70,28 @@ public class ListAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
         holder.subreddit.setText(post.getData().getSubreddit());
         holder.user.setText(post.getData().getAuthor());
 
+        String url = post.getData().getThumbnail();
+
         if(post.getData().getPreview().getEnabled()) {
             List<Resolution> resolutions = post.getData().getPreview().getImages().get(0).getResolutions();
+            int width = Resources.getSystem().getDisplayMetrics().widthPixels;
+            Resolution current = resolutions.get(0);
 
+            for(Resolution res : resolutions)
+                if(res.getWidth() > current.getWidth() && res.getWidth() <width)
+                    current = res;
 
-            Picasso.with(context).
-                    load(Html.fromHtml(resolutions.get(resolutions.size() - 1).getUrl()).toString()). // TODO: 15-08-2017
-                    placeholder(R.color.cardview_dark_background).
-                    resize(resolutions.get(resolutions.size() - 1).getWidth(), resolutions.get(resolutions.size() - 1).getHeight()).
-                    into(holder.preview);
-
+            Log.d(TAG, "Position: " + position + ", " + current.getWidth() + "x" + current.getHeight());
+            // TODO: 18-08-2017 find alternative non-deprecated function
+            url = Html.fromHtml(current.getUrl()).toString();
         }
-        else
-            Picasso.with(context).
-                    load(post.getData().getThumbnail()).
-                    resize(post.getData().getThumbnailWidth(), post.getData().getThumbnailHeight()).
-                    placeholder(R.color.cardview_dark_background).
-                    into(holder.preview);
 
+        Picasso.with(context).
+                load(url).
+                placeholder(R.color.cardview_dark_background).
+                into(holder.preview);
 
+        // TODO: 18-08-2017 temporary solution
         holder.preview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -106,11 +109,14 @@ public class ListAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
     }
 
     public void updatePosts(RedditResponse response) {
+
+        for(Post p : response.getData().getPosts())
+            Log.d("LINKS", p.getData().getUrl());
+
         posts.addAll(response.getData().getPosts());
         after = response.getData().getAfter();
         notifyDataSetChanged();
     }
-
 
 
 }

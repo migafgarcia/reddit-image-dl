@@ -5,8 +5,8 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.migafgarcia.redditimagedownloader.adapters.ListAdapter;
-import com.migafgarcia.redditimagedownloader.data.Post;
-import com.migafgarcia.redditimagedownloader.data.RedditResponse;
+import com.migafgarcia.redditimagedownloader.reddit_json.Post;
+import com.migafgarcia.redditimagedownloader.reddit_json.RedditResponse;
 
 import java.util.Iterator;
 import java.util.List;
@@ -14,7 +14,6 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
 
 public class Controller implements Callback<RedditResponse> {
 
@@ -50,11 +49,10 @@ public class Controller implements Callback<RedditResponse> {
         while(itr.hasNext()) {
             Post curr = itr.next();
 
-            if(curr.getData().getPostHint() == null || !curr.getData().getPostHint().equals("image")) {
+            if (curr.getData().getPostHint() == null || !curr.getData().getPostHint().equals("image")) {
                 itr.remove();
                 Log.d(TAG, "Item removed");
             }
         }
-
     }
 }

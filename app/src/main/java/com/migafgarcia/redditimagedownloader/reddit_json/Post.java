@@ -1,9 +1,9 @@
-package com.migafgarcia.redditimagedownloader.data;
+package com.migafgarcia.redditimagedownloader.reddit_json;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class RedditResponse {
+public class Post {
 
     @SerializedName("kind")
     @Expose
@@ -11,13 +11,13 @@ public class RedditResponse {
 
     @SerializedName("data")
     @Expose
-    private Data data;
+    private Data_ data;
 
     public String getKind() {
         return kind;
     }
 
-    public Data getData() {
+    public Data_ getData() {
         return data;
     }
 }

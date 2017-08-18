@@ -1,7 +1,6 @@
 
-package com.migafgarcia.redditimagedownloader.data;
+package com.migafgarcia.redditimagedownloader.reddit_json;
 
-import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
