@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.migafgarcia.redditimagedownloader.PreviewActivity;
 import com.migafgarcia.redditimagedownloader.R;
 import com.migafgarcia.redditimagedownloader.controllers.Controller;
 import com.migafgarcia.redditimagedownloader.reddit_json.Post;
@@ -95,8 +96,8 @@ public class ListAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
         holder.preview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse(post.getData().getUrl()));
+                Intent i = new Intent(context, PreviewActivity.class);
+                i.putExtra("url", post.getData().getUrl());
                 i.setFlags(FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(i);
             }

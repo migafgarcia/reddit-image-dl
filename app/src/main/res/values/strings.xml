@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Reddit Image Downloader</string>
     <string name="preview_content_description">Preview of the original image</string>
-    <string name="multireddit">EarthPorn+CityPorn+SkyPorn+WeatherPorn+BotanicalPorn+LakePorn+VillagePorn+BeachPorn+WaterPorn+SpacePorn+multiwall+wallpapers+wallpaper+offensive_wallpapers+nocontext_wallpapers</string>
+    <string name="multireddit">EarthPorn+CityPorn+SkyPorn+WeatherPorn+BotanicalPorn+LakePorn+VillagePorn+BeachPorn+WaterPorn+SpacePorn+multiwall+wallpapers+wallpaper+nocontext_wallpapers</string>
 
     <string name="user_prefix">/u/</string>
     <string name="subreddit_prefix">/r/</string>

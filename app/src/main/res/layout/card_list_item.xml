@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="2dp"
-    android:layout_marginEnd="4dp"
-    android:layout_marginStart="4dp"
-    android:layout_marginTop="2dp"
+    android:layout_margin="0dp"
     android:clickable="true">
 
     <ImageView
@@ -27,8 +23,7 @@
         android:id="@+id/title_textview"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:paddingBottom="4dp"
-        android:paddingTop="4dp"
+        android:layout_margin="4dp"
         android:shadowColor="#7F000000"
         android:shadowDx="1"
         android:shadowDy="1"
@@ -45,6 +40,7 @@
     <GridLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_margin="4dp"
         android:clickable="true"
         android:columnCount="2"
         android:rowCount="1"
@@ -58,9 +54,6 @@
             android:layout_height="wrap_content"
             android:layout_column="0"
             android:layout_gravity="start"
-            android:layout_marginBottom="2dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="2dp"
             android:layout_row="0"
             android:shadowColor="#7F000000"
             android:shadowDx="1"
@@ -77,9 +70,6 @@
             android:layout_height="wrap_content"
             android:layout_column="1"
             android:layout_gravity="end"
-            android:layout_marginBottom="2dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginTop="2dp"
             android:layout_row="0"
             android:shadowColor="#7F000000"
             android:shadowDx="1"
