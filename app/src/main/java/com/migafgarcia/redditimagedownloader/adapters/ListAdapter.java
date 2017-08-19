@@ -3,7 +3,6 @@ package com.migafgarcia.redditimagedownloader.adapters;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.util.Log;
@@ -30,7 +29,7 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
 public class ListAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
 
-    public static final String TAG = "ListAdapter";
+    public static final String TAG = ListAdapter.class.getName();
 
     private Context context;
     private RedditService service;

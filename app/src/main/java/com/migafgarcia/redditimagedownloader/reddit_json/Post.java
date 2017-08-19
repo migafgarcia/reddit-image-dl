@@ -5,6 +5,8 @@ import com.google.gson.annotations.SerializedName;
 
 public class Post {
 
+    public static final String TAG = Post.class.getName();
+
     @SerializedName("kind")
     @Expose
     private String kind;

@@ -6,6 +6,8 @@ import com.google.gson.annotations.SerializedName;
 
 public class Resolution {
 
+    public static final String TAG = Resolution.class.getName();
+
     @SerializedName("url")
     @Expose
     private String url;

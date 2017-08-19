@@ -8,6 +8,8 @@ import java.util.List;
 
 public class Preview {
 
+    public static final String TAG = Preview.class.getName();
+
     @SerializedName("images")
     @Expose
     private List<Image> images = null;

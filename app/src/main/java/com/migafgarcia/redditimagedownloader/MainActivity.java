@@ -14,7 +14,7 @@ import com.migafgarcia.redditimagedownloader.adapters.ListAdapter;
 
 public class MainActivity extends Activity {
 
-    public static final String TAG = "MainActivity";
+    public static final String TAG = MainActivity.class.getName();
 
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -30,7 +30,7 @@ public class MainActivity extends Activity {
         recyclerView = findViewById(R.id.main_recyclerview);
         floatingActionButton = findViewById(R.id.list_fab);
         swipeRefreshLayout = findViewById(R.id.list_swiperefreshlayout);
-        
+
         mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -56,8 +56,5 @@ public class MainActivity extends Activity {
                     }
                 }
         );
-
-
     }
-
 }

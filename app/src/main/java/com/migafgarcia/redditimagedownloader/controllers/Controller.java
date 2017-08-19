@@ -17,7 +17,7 @@ import retrofit2.Response;
 
 public class Controller implements Callback<RedditResponse> {
 
-    public static final String TAG = "Controller";
+    public static final String TAG = Controller.class.getName();
 
     private Context mContext;
     private ListAdapter adapter;

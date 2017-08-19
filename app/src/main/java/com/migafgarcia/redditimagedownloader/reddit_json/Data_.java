@@ -6,6 +6,8 @@ import com.google.gson.annotations.SerializedName;
 
 public class Data_ {
 
+    public static final String TAG = Data_.class.getName();
+
     @SerializedName("thumbnail_width")
     @Expose
     private Integer thumbnailWidth;

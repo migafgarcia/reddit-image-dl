@@ -7,6 +7,8 @@ import com.google.gson.annotations.SerializedName;
 
 public class Image {
 
+    public static final String TAG = Image.class.getName();
+
     @SerializedName("source")
     @Expose
     private Resolution source;

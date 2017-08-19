@@ -10,6 +10,8 @@ import com.squareup.picasso.Picasso;
 
 public class PreviewActivity extends AppCompatActivity {
 
+    public static final String TAG = PreviewActivity.class.getName();
+
     private FloatingActionButton floatingActionButton;
     private ZoomageView preview;
 

@@ -6,6 +6,8 @@ import com.google.gson.annotations.SerializedName;
 
 public class Data {
 
+    public static final String TAG = Data.class.getName();
+
     @SerializedName("modhash")
     @Expose
     private String modhash;
