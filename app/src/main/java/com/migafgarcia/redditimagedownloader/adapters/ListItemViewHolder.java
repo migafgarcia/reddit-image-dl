@@ -6,16 +6,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.migafgarcia.redditimagedownloader.R;
+import com.migafgarcia.redditimagedownloader.reddit_json.Post;
 
-public class ListItemViewHolder extends RecyclerView.ViewHolder {
+class ListItemViewHolder extends RecyclerView.ViewHolder {
 
     public static final String TAG = ListItemViewHolder.class.getName();
 
     TextView title, subreddit, user;
     ImageView preview;
 
-
-    public ListItemViewHolder(View itemView) {
+    ListItemViewHolder(View itemView) {
         super(itemView);
         title = itemView.findViewById(R.id.title_textview);
         subreddit = itemView.findViewById(R.id.subreddit_textview);

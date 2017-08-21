@@ -6,9 +6,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import com.jsibbold.zoomage.ZoomageView;
+import com.migafgarcia.redditimagedownloader.presenters.PreviewScreen;
 import com.squareup.picasso.Picasso;
 
-public class PreviewActivity extends AppCompatActivity {
+import org.greenrobot.eventbus.EventBus;
+
+public class PreviewActivity extends AppCompatActivity implements PreviewScreen {
 
     public static final String TAG = PreviewActivity.class.getName();
 
@@ -29,4 +32,39 @@ public class PreviewActivity extends AppCompatActivity {
         String url = intent.getStringExtra("url");
         Picasso.with(getApplicationContext()).load(url).into(preview);
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Override
+    public void downloadImage() {
+
+    }
+
+    @Override
+    public void setAs() {
+
+    }
+
+    @Override
+    public void goToThread() {
+
+    }
+
+    @Override
+    public void goToSubreddit() {
+
+    }
+
+
+
 }

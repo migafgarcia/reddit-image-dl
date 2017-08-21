@@ -1,6 +1,7 @@
 package com.migafgarcia.redditimagedownloader;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -13,9 +14,11 @@ import android.widget.Toast;
 import com.migafgarcia.redditimagedownloader.adapters.ListAdapter;
 import com.migafgarcia.redditimagedownloader.events.ErrorGettingPostsEvent;
 import com.migafgarcia.redditimagedownloader.events.GetPostsEvent;
+import com.migafgarcia.redditimagedownloader.events.LaunchPreviewEvent;
 import com.migafgarcia.redditimagedownloader.events.MorePostsEvent;
 import com.migafgarcia.redditimagedownloader.presenters.MainPresenter;
 import com.migafgarcia.redditimagedownloader.presenters.MainScreen;
+import com.migafgarcia.redditimagedownloader.reddit_json.Post;
 import com.migafgarcia.redditimagedownloader.services.RedditApi;
 
 import org.greenrobot.eventbus.EventBus;
@@ -47,14 +50,14 @@ public class MainActivity extends Activity implements MainScreen {
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        listAdapter = new ListAdapter(getApplicationContext());
+        listAdapter = new ListAdapter(getApplicationContext(), this);
         recyclerView.setAdapter(listAdapter);
 
         floatingActionButton.bringToFront();
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                recyclerView.smoothScrollToPosition(0);
+                scrollToStart();
             }
         });
 
@@ -95,18 +98,19 @@ public class MainActivity extends Activity implements MainScreen {
     }
 
     @Override
-    public void morePosts() {
-        mainPresenter.morePosts();
+    public void morePosts(String after) {
+        swipeRefreshLayout.setRefreshing(true);
+        mainPresenter.morePosts(after);
     }
 
     @Override
-    public void launchPreview() {
-
+    public void launchPreview(Post post) {
+        mainPresenter.launchPreview(post);
     }
 
     @Override
     public void scrollToStart() {
-
+        recyclerView.smoothScrollToPosition(0);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -119,6 +123,8 @@ public class MainActivity extends Activity implements MainScreen {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(MorePostsEvent morePostsEvent) {
         listAdapter.morePosts(morePostsEvent.getResponse());
+        swipeRefreshLayout.setRefreshing(false);
+        Toast.makeText(getApplicationContext(), "Posts refreshed", Toast.LENGTH_LONG).show();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -126,5 +132,12 @@ public class MainActivity extends Activity implements MainScreen {
         // TODO: 21-08-2017 display better error message
         swipeRefreshLayout.setRefreshing(false);
         Toast.makeText(getApplicationContext(), "Error getting posts", Toast.LENGTH_LONG).show();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(LaunchPreviewEvent event) {
+        Intent i = new Intent(getApplicationContext(), PreviewActivity.class);
+        i.putExtra("url", event.getPost().getData().getUrl());
+        startActivity(i);
     }
 }
