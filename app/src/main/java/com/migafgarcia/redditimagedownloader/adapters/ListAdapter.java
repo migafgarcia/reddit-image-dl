@@ -12,18 +12,13 @@ import android.view.ViewGroup;
 
 import com.migafgarcia.redditimagedownloader.PreviewActivity;
 import com.migafgarcia.redditimagedownloader.R;
-import com.migafgarcia.redditimagedownloader.controllers.Controller;
 import com.migafgarcia.redditimagedownloader.reddit_json.Post;
 import com.migafgarcia.redditimagedownloader.reddit_json.RedditResponse;
 import com.migafgarcia.redditimagedownloader.reddit_json.Resolution;
-import com.migafgarcia.redditimagedownloader.services.RedditService;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
@@ -32,7 +27,6 @@ public class ListAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
     public static final String TAG = ListAdapter.class.getName();
 
     private Context context;
-    private RedditService service;
     private List<Post> posts;
     private String after;
 
@@ -40,14 +34,6 @@ public class ListAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
         this.context = context;
         posts = new ArrayList<>(0);
         after = "";
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(context.getString(R.string.reddit_base_url))
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        service = retrofit.create(RedditService.class);
-        service.getList(context.getString(R.string.multireddit)).enqueue(new Controller(context, this));
     }
 
     @Override
@@ -62,10 +48,10 @@ public class ListAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
 
         final Post post = posts.get(position);
 
-        if (position == getItemCount() - 1 && getItemCount() > 0)
-            service.getListAfter(context.getString(R.string.multireddit), after).
-                    enqueue(new Controller(context, this));
+        //if (position == getItemCount() - 1 && getItemCount() > 0)
+            // TODO: 21-08-2017 get more posts 
 
+        // Log.d(TAG, post.getData().getTitle());
         holder.title.setText(post.getData().getTitle());
         holder.subreddit.setText(post.getData().getSubreddit());
         holder.user.setText(post.getData().getAuthor());
@@ -108,11 +94,14 @@ public class ListAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
         return posts.size();
     }
 
-    public void updatePosts(RedditResponse response) {
+    public void getPosts(RedditResponse response) {
+        posts.clear();
+        posts.addAll(response.getData().getPosts());
+        after = response.getData().getAfter();
+        notifyDataSetChanged();
+    }
 
-        for(Post p : response.getData().getPosts())
-            Log.d("LINKS", p.getData().getUrl());
-
+    public void morePosts(RedditResponse response) {
         posts.addAll(response.getData().getPosts());
         after = response.getData().getAfter();
         notifyDataSetChanged();

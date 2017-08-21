@@ -7,14 +7,26 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.migafgarcia.redditimagedownloader.adapters.ListAdapter;
+import com.migafgarcia.redditimagedownloader.events.ErrorGettingPostsEvent;
+import com.migafgarcia.redditimagedownloader.events.GetPostsEvent;
+import com.migafgarcia.redditimagedownloader.events.MorePostsEvent;
+import com.migafgarcia.redditimagedownloader.presenters.MainPresenter;
+import com.migafgarcia.redditimagedownloader.presenters.MainScreen;
+import com.migafgarcia.redditimagedownloader.services.RedditApi;
 
-public class MainActivity extends Activity {
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
+public class MainActivity extends Activity implements MainScreen {
 
     public static final String TAG = MainActivity.class.getName();
+
+    private MainPresenter mainPresenter;
 
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -46,15 +58,73 @@ public class MainActivity extends Activity {
             }
         });
 
+        mainPresenter = new MainPresenter(new RedditApi());
+
         swipeRefreshLayout.setOnRefreshListener(
                 new SwipeRefreshLayout.OnRefreshListener() {
                     @Override
                     public void onRefresh() {
-                        listAdapter = new ListAdapter(getApplicationContext());
-                        recyclerView.setAdapter(listAdapter);
-                        swipeRefreshLayout.setRefreshing(false);
+                        getPosts();
                     }
                 }
         );
+
+        getPosts();
+    }
+
+    private void initRecyclerView() {
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Override
+    public void getPosts() {
+        swipeRefreshLayout.setRefreshing(true);
+        mainPresenter.getPosts();
+    }
+
+    @Override
+    public void morePosts() {
+        mainPresenter.morePosts();
+    }
+
+    @Override
+    public void launchPreview() {
+
+    }
+
+    @Override
+    public void scrollToStart() {
+
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(GetPostsEvent getPostsEvent) {
+        listAdapter.getPosts(getPostsEvent.getResponse());
+        swipeRefreshLayout.setRefreshing(false);
+        Toast.makeText(getApplicationContext(), "Posts refreshed", Toast.LENGTH_LONG).show();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(MorePostsEvent morePostsEvent) {
+        listAdapter.morePosts(morePostsEvent.getResponse());
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(ErrorGettingPostsEvent error) {
+        // TODO: 21-08-2017 display better error message
+        swipeRefreshLayout.setRefreshing(false);
+        Toast.makeText(getApplicationContext(), "Error getting posts", Toast.LENGTH_LONG).show();
     }
 }

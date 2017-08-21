@@ -35,5 +35,6 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:design:26.0.0-alpha1'
     compile 'com.jsibbold:zoomage:1.1.0'
-
+    compile 'com.google.dagger:dagger:2.11'
+    compile 'org.greenrobot:eventbus:3.0.0'
 }
