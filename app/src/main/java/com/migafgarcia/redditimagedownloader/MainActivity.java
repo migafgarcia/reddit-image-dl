@@ -8,6 +8,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Toast;
 
@@ -32,6 +33,8 @@ public class MainActivity extends Activity implements MainScreen {
     private MainPresenter mainPresenter;
 
     private RecyclerView recyclerView;
+    private Toolbar toolbar;
+
     private RecyclerView.LayoutManager mLayoutManager;
     private ListAdapter listAdapter;
     private FloatingActionButton floatingActionButton;
@@ -41,6 +44,7 @@ public class MainActivity extends Activity implements MainScreen {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
 
         recyclerView = findViewById(R.id.main_recyclerview);
         floatingActionButton = findViewById(R.id.list_fab);

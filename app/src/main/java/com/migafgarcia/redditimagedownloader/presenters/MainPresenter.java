@@ -27,7 +27,7 @@ public class MainPresenter implements MainScreen {
     @Override
     public void getPosts() {
         // TODO: 21-08-2017 fetch subreddits from sqlite
-        redditApi.getService().getList("EarthPorn").enqueue(new Callback<RedditResponse>() {
+        redditApi.getService().getList("wallpaper").enqueue(new Callback<RedditResponse>() {
             @Override
             public void onResponse(Call<RedditResponse> call, Response<RedditResponse> response) {
                 if(response.isSuccessful()) {
@@ -47,7 +47,7 @@ public class MainPresenter implements MainScreen {
 
     @Override
     public void morePosts(String after) {
-        redditApi.getService().getListAfter("EarthPorn", after).enqueue(new Callback<RedditResponse>() {
+        redditApi.getService().getListAfter("wallpaper", after).enqueue(new Callback<RedditResponse>() {
             @Override
             public void onResponse(Call<RedditResponse> call, Response<RedditResponse> response) {
                 if(response.isSuccessful()) {
