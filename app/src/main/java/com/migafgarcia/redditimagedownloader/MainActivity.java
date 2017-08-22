@@ -1,15 +1,17 @@
 package com.migafgarcia.redditimagedownloader;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.Toast;
 
 import com.migafgarcia.redditimagedownloader.adapters.ListAdapter;
@@ -26,7 +28,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-public class MainActivity extends Activity implements MainScreen {
+public class MainActivity extends AppCompatActivity implements MainScreen {
 
     public static final String TAG = MainActivity.class.getName();
 
@@ -45,10 +47,11 @@ public class MainActivity extends Activity implements MainScreen {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
-        recyclerView = findViewById(R.id.main_recyclerview);
-        floatingActionButton = findViewById(R.id.list_fab);
-        swipeRefreshLayout = findViewById(R.id.list_swiperefreshlayout);
+        recyclerView = (RecyclerView) findViewById(R.id.main_recyclerview);
+        floatingActionButton = (FloatingActionButton) findViewById(R.id.list_fab);
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.list_swiperefreshlayout);
 
         mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
@@ -76,7 +79,16 @@ public class MainActivity extends Activity implements MainScreen {
                 }
         );
 
+
         getPosts();
+    }
+
+    private void hideViews() {
+        toolbar.animate().translationY(-toolbar.getHeight()).setInterpolator(new AccelerateInterpolator(2));
+    }
+
+    private void showViews() {
+        toolbar.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2));
     }
 
     private void initRecyclerView() {
