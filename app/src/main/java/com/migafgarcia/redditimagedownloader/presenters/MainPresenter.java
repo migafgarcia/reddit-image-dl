@@ -71,6 +71,16 @@ public class MainPresenter implements MainScreen {
     }
 
     @Override
+    public void launchSettings() {
+
+    }
+
+    @Override
+    public void launchManageSubreddits() {
+
+    }
+
+    @Override
     public void scrollToStart() {
 
     }

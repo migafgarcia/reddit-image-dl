@@ -12,13 +12,13 @@
         android:layout_alignParentEnd="true"
         android:layout_margin="@dimen/fab_margin"
         android:clickable="true"
-        app:backgroundTint="@android:color/background_dark"
         app:elevation="@dimen/fab_elevation"
         app:fabSize="normal"
-        app:srcCompat="@android:drawable/stat_sys_download_done" />
+        app:srcCompat="@drawable/ic_file_download_black_24dp" />
 
     <com.jsibbold.zoomage.ZoomageView
-        android:id="@+id/preview_imageview"
+        android:id="@+id/preview"
+        android:transitionName="preview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:zoomage_animateOnReset="true"

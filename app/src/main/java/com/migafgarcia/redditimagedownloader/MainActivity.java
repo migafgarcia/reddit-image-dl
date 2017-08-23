@@ -3,12 +3,16 @@ package com.migafgarcia.redditimagedownloader;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
@@ -79,20 +83,7 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
                 }
         );
 
-
         getPosts();
-    }
-
-    private void hideViews() {
-        toolbar.animate().translationY(-toolbar.getHeight()).setInterpolator(new AccelerateInterpolator(2));
-    }
-
-    private void showViews() {
-        toolbar.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2));
-    }
-
-    private void initRecyclerView() {
-
     }
 
     @Override
@@ -125,8 +116,41 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
     }
 
     @Override
+    public void launchSettings() {
+
+    }
+
+    @Override
+    public void launchManageSubreddits() {
+
+    }
+
+    @Override
     public void scrollToStart() {
         recyclerView.smoothScrollToPosition(0);
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
+                return true;
+            case R.id.action_manage_subreddits:
+                startActivity(new Intent(getApplicationContext(), ManageSubredditsActivity.class));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_appbar_buttons, menu);
+        return true;
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -154,6 +178,32 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
     public void onEvent(LaunchPreviewEvent event) {
         Intent i = new Intent(getApplicationContext(), PreviewActivity.class);
         i.putExtra("url", event.getPost().getData().getUrl());
-        startActivity(i);
+        ActivityOptionsCompat options = ActivityOptionsCompat.
+                makeSceneTransitionAnimation(this, (View)findViewById(R.id.preview), "preview");
+        startActivity(i, options.toBundle());
+    }
+
+    // TODO: 23-08-2017 use snackbar with retry action
+    class RetryGetListener implements View.OnClickListener{
+
+        @Override
+        public void onClick(View v) {
+            getPosts();
+        }
+    }
+
+    // TODO: 23-08-2017 use snackbar with retry action
+    class RetryMoreListener implements View.OnClickListener{
+
+        private String after;
+
+        public RetryMoreListener(String after) {
+            this.after = after;
+        }
+
+        @Override
+        public void onClick(View v) {
+            morePosts(after);
+        }
     }
 }

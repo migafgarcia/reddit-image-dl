@@ -1,0 +1,13 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="General">
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="nsfw_switch"
+            android:summary="@string/pref_description_nsfw"
+            android:title="@string/pref_title_nsfw" />
+
+    </PreferenceCategory>
+
+
+</PreferenceScreen>
