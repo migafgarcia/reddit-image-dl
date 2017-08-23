@@ -4,8 +4,13 @@ import android.app.DownloadManager;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.jsibbold.zoomage.ZoomageView;
@@ -21,11 +26,18 @@ public class PreviewActivity extends AppCompatActivity implements PreviewScreen 
 
     private FloatingActionButton floatingActionButton;
     private ZoomageView preview;
+    private Toolbar toolbar;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_preview);
+
+        toolbar = (Toolbar) findViewById(R.id.preview_toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar ab = getSupportActionBar();
+        ab.setDisplayHomeAsUpEnabled(true);
 
         floatingActionButton = (FloatingActionButton) findViewById(R.id.preview_fab);
         preview = (ZoomageView) findViewById(R.id.preview);
@@ -83,6 +95,22 @@ public class PreviewActivity extends AppCompatActivity implements PreviewScreen 
     @Override
     public void goToSubreddit() {
 
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            default:
+                return super.onOptionsItemSelected(item);
+
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.preview_appbar_buttons, menu);
+        return true;
     }
 
 }

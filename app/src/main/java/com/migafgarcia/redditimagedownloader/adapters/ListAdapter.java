@@ -10,7 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.migafgarcia.redditimagedownloader.R;
-import com.migafgarcia.redditimagedownloader.presenters.MainScreen;
+import com.migafgarcia.redditimagedownloader.presenters.MainPresenter;
 import com.migafgarcia.redditimagedownloader.reddit_json.Post;
 import com.migafgarcia.redditimagedownloader.reddit_json.RedditResponse;
 import com.migafgarcia.redditimagedownloader.reddit_json.Resolution;
@@ -24,16 +24,20 @@ public class ListAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
     public static final String TAG = ListAdapter.class.getName();
 
     private Context context;
-    private MainScreen mainScreen;
+    private ItemClickCallback itemClickCallback;
+    private MorePostsCallback morePostsCallback;
     private List<Post> posts;
     private String after;
 
-    public ListAdapter(Context context, MainScreen mainScreen) {
+    public ListAdapter(Context context, ItemClickCallback itemClickCallback, MorePostsCallback morePostsCallback) {
         this.context = context;
-        this.mainScreen = mainScreen;
+        this.itemClickCallback = itemClickCallback;
+        this.morePostsCallback = morePostsCallback;
         posts = new ArrayList<>(0);
         after = "";
     }
+
+
 
     @Override
     public ListItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -48,7 +52,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
         final Post post = posts.get(position);
 
         if (position == 3 * getItemCount() / 4 && getItemCount() > 0)
-            mainScreen.morePosts(after);
+            morePostsCallback.onMorePosts(after);
 
 
         holder.title.setText(post.getData().getTitle());
@@ -79,7 +83,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
         holder.preview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mainScreen.launchPreview(post);
+                itemClickCallback.onItemClick(post);
             }
         });
 
@@ -101,5 +105,13 @@ public class ListAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
         posts.addAll(response.getData().getPosts());
         after = response.getData().getAfter();
         notifyDataSetChanged();
+    }
+
+    public interface ItemClickCallback {
+        void onItemClick(Post post);
+    }
+
+    public interface MorePostsCallback {
+        void onMorePosts(String after);
     }
 }

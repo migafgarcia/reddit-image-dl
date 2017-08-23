@@ -1,87 +1,81 @@
 package com.migafgarcia.redditimagedownloader.presenters;
 
-
-import com.migafgarcia.redditimagedownloader.events.ErrorGettingPostsEvent;
-import com.migafgarcia.redditimagedownloader.events.GetPostsEvent;
-import com.migafgarcia.redditimagedownloader.events.LaunchPreviewEvent;
-import com.migafgarcia.redditimagedownloader.events.MorePostsEvent;
-import com.migafgarcia.redditimagedownloader.reddit_json.Post;
 import com.migafgarcia.redditimagedownloader.reddit_json.RedditResponse;
 import com.migafgarcia.redditimagedownloader.services.RedditApi;
 import com.migafgarcia.redditimagedownloader.utils.Utils;
 
-import org.greenrobot.eventbus.EventBus;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainPresenter implements MainScreen {
+public class MainPresenter implements Presenter<MainScreen> {
 
+    private MainScreen mainScreen;
     private RedditApi redditApi;
 
-    public MainPresenter(RedditApi redditApi) {
+    public MainPresenter(MainScreen mainScreen, RedditApi redditApi) {
+        this.mainScreen = mainScreen;
         this.redditApi = redditApi;
     }
 
-    @Override
     public void getPosts() {
+
+        mainScreen.showLoading();
+
         // TODO: 21-08-2017 fetch subreddits from sqlite
         redditApi.getService().getList("wallpaper").enqueue(new Callback<RedditResponse>() {
             @Override
             public void onResponse(Call<RedditResponse> call, Response<RedditResponse> response) {
                 if(response.isSuccessful()) {
                     Utils.processPosts(response.body());
-                    EventBus.getDefault().post(new GetPostsEvent(response.body()));
+                    mainScreen.getPosts(response.body());
                 }
                 else
-                    EventBus.getDefault().post(new ErrorGettingPostsEvent());
+                    mainScreen.showGetRetry();
+
+                mainScreen.hideLoading();
             }
 
             @Override
             public void onFailure(Call<RedditResponse> call, Throwable t) {
-                EventBus.getDefault().post(new ErrorGettingPostsEvent());
+                mainScreen.showGetRetry();
+                mainScreen.hideLoading();
             }
         });
     }
 
-    @Override
-    public void morePosts(String after) {
+    public void morePosts(final String after) {
+        mainScreen.showLoading();
         redditApi.getService().getListAfter("wallpaper", after).enqueue(new Callback<RedditResponse>() {
             @Override
             public void onResponse(Call<RedditResponse> call, Response<RedditResponse> response) {
                 if(response.isSuccessful()) {
                     Utils.processPosts(response.body());
-                    EventBus.getDefault().post(new MorePostsEvent(response.body()));
+                    mainScreen.morePosts(response.body());
                 }
                 else
-                    EventBus.getDefault().post(new ErrorGettingPostsEvent());
+                    mainScreen.showMoreRetry(after);
+
+                mainScreen.hideLoading();
             }
 
             @Override
             public void onFailure(Call<RedditResponse> call, Throwable t) {
-                EventBus.getDefault().post(new ErrorGettingPostsEvent());
+                mainScreen.showMoreRetry(after);
+                mainScreen.hideLoading();
             }
         });
     }
 
     @Override
-    public void launchPreview(Post post) {
-        EventBus.getDefault().post(new LaunchPreviewEvent(post));
-    }
-
-    @Override
-    public void launchSettings() {
+    public void attachView(MainScreen mainScreen) {
+        this.mainScreen = mainScreen;
 
     }
 
     @Override
-    public void launchManageSubreddits() {
-
-    }
-
-    @Override
-    public void scrollToStart() {
-
+    public void detachView() {
+        this.mainScreen = null;
     }
 }

@@ -1,8 +1,10 @@
 package com.migafgarcia.redditimagedownloader;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -14,23 +16,15 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.Toast;
 
 import com.migafgarcia.redditimagedownloader.adapters.ListAdapter;
-import com.migafgarcia.redditimagedownloader.events.ErrorGettingPostsEvent;
-import com.migafgarcia.redditimagedownloader.events.GetPostsEvent;
-import com.migafgarcia.redditimagedownloader.events.LaunchPreviewEvent;
-import com.migafgarcia.redditimagedownloader.events.MorePostsEvent;
 import com.migafgarcia.redditimagedownloader.presenters.MainPresenter;
 import com.migafgarcia.redditimagedownloader.presenters.MainScreen;
 import com.migafgarcia.redditimagedownloader.reddit_json.Post;
+import com.migafgarcia.redditimagedownloader.reddit_json.RedditResponse;
 import com.migafgarcia.redditimagedownloader.services.RedditApi;
 
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 public class MainActivity extends AppCompatActivity implements MainScreen {
 
@@ -61,7 +55,21 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        listAdapter = new ListAdapter(getApplicationContext(), this);
+        ListAdapter.ItemClickCallback itemClickCallback = new ListAdapter.ItemClickCallback() {
+            @Override
+            public void onItemClick(Post post) {
+                launchPreview(post);
+            }
+        };
+
+        ListAdapter.MorePostsCallback morePostsCallback = new ListAdapter.MorePostsCallback() {
+            @Override
+            public void onMorePosts(String after) {
+                mainPresenter.morePosts(after);
+            }
+        };
+
+        listAdapter = new ListAdapter(getApplicationContext(), itemClickCallback, morePostsCallback);
         recyclerView.setAdapter(listAdapter);
 
         floatingActionButton.bringToFront();
@@ -72,57 +80,79 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
             }
         });
 
-        mainPresenter = new MainPresenter(new RedditApi());
+        mainPresenter = new MainPresenter(this, new RedditApi());
 
         swipeRefreshLayout.setOnRefreshListener(
                 new SwipeRefreshLayout.OnRefreshListener() {
                     @Override
                     public void onRefresh() {
-                        getPosts();
+                        mainPresenter.getPosts();
                     }
                 }
         );
 
-        getPosts();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        EventBus.getDefault().register(this);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        EventBus.getDefault().unregister(this);
-    }
-
-    @Override
-    public void getPosts() {
-        swipeRefreshLayout.setRefreshing(true);
         mainPresenter.getPosts();
     }
 
     @Override
-    public void morePosts(String after) {
+    public void getPosts(RedditResponse response) {
+        listAdapter.getPosts(response);
+    }
+
+    @Override
+    public void morePosts(RedditResponse response) {
+        listAdapter.morePosts(response);
+    }
+
+    @Override
+    public void showToast(String error) {
+        Toast.makeText(getApplicationContext(), error, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void showLoading() {
         swipeRefreshLayout.setRefreshing(true);
-        mainPresenter.morePosts(after);
+    }
+
+    @Override
+    public void hideLoading() {
+        swipeRefreshLayout.setRefreshing(false);
+    }
+
+    @Override
+    public void showGetRetry() {
+        Snackbar mySnackbar = Snackbar.make(findViewById(R.id.main_coordinator_layout),
+                "Error getting posts", Snackbar.LENGTH_INDEFINITE);
+        mySnackbar.setAction("Retry", new RetryGetListener());
+        mySnackbar.show();
+    }
+
+    @Override
+    public void showMoreRetry(String after) {
+        Snackbar mySnackbar = Snackbar.make(findViewById(R.id.main_coordinator_layout),
+                "Error getting posts", Snackbar.LENGTH_INDEFINITE);
+        mySnackbar.setAction("Retry", new RetryMoreListener(after));
+        mySnackbar.show();
+
     }
 
     @Override
     public void launchPreview(Post post) {
-        mainPresenter.launchPreview(post);
+        Intent i = new Intent(getApplicationContext(), PreviewActivity.class);
+        i.putExtra("url", post.getData().getUrl());
+        ActivityOptionsCompat options = ActivityOptionsCompat.
+                makeSceneTransitionAnimation(this, (View) findViewById(R.id.preview), "preview");
+        startActivity(i, options.toBundle());
     }
 
     @Override
     public void launchSettings() {
-
+        startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
     }
 
     @Override
     public void launchManageSubreddits() {
-
+        startActivity(new Intent(getApplicationContext(), ManageSubredditsActivity.class));
     }
 
     @Override
@@ -135,10 +165,10 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_settings:
-                startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
+                launchSettings();
                 return true;
             case R.id.action_manage_subreddits:
-                startActivity(new Intent(getApplicationContext(), ManageSubredditsActivity.class));
+                launchManageSubreddits();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -153,47 +183,22 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
         return true;
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(GetPostsEvent getPostsEvent) {
-        listAdapter.getPosts(getPostsEvent.getResponse());
-        swipeRefreshLayout.setRefreshing(false);
-        Toast.makeText(getApplicationContext(), "Posts refreshed", Toast.LENGTH_LONG).show();
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(MorePostsEvent morePostsEvent) {
-        listAdapter.morePosts(morePostsEvent.getResponse());
-        swipeRefreshLayout.setRefreshing(false);
-        Toast.makeText(getApplicationContext(), "Posts refreshed", Toast.LENGTH_LONG).show();
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(ErrorGettingPostsEvent error) {
-        // TODO: 21-08-2017 display better error message
-        swipeRefreshLayout.setRefreshing(false);
-        Toast.makeText(getApplicationContext(), "Error getting posts", Toast.LENGTH_LONG).show();
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(LaunchPreviewEvent event) {
-        Intent i = new Intent(getApplicationContext(), PreviewActivity.class);
-        i.putExtra("url", event.getPost().getData().getUrl());
-        ActivityOptionsCompat options = ActivityOptionsCompat.
-                makeSceneTransitionAnimation(this, (View)findViewById(R.id.preview), "preview");
-        startActivity(i, options.toBundle());
+    @Override
+    public Context getContext() {
+        return getApplicationContext();
     }
 
     // TODO: 23-08-2017 use snackbar with retry action
-    class RetryGetListener implements View.OnClickListener{
+    class RetryGetListener implements View.OnClickListener {
 
         @Override
         public void onClick(View v) {
-            getPosts();
+            mainPresenter.getPosts();
         }
     }
 
     // TODO: 23-08-2017 use snackbar with retry action
-    class RetryMoreListener implements View.OnClickListener{
+    class RetryMoreListener implements View.OnClickListener {
 
         private String after;
 
@@ -203,7 +208,7 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
 
         @Override
         public void onClick(View v) {
-            morePosts(after);
+            mainPresenter.morePosts(after);
         }
     }
 }

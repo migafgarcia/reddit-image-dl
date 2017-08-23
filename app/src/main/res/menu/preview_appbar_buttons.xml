@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_download"
+        android:icon="@drawable/ic_file_download_black_24dp"
+        android:title="@string/action_download"
+        android:visible="true"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_set_as"
+        android:icon="@drawable/ic_wallpaper_black_24dp"
+        android:title="@string/action_set_as"
+        android:visible="true"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_thread"
+        android:icon="@drawable/ic_web_black_24dp"
+        android:title="@string/action_thread"
+        android:visible="true"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_subreddit"
+        android:icon="@drawable/ic_web_black_24dp"
+        android:title="@string/action_subreddit"
+        android:visible="true"
+        app:showAsAction="never" />
+</menu>
