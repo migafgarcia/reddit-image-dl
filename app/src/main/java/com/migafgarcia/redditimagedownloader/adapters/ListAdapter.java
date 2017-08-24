@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.migafgarcia.redditimagedownloader.R;
-import com.migafgarcia.redditimagedownloader.presenters.MainPresenter;
 import com.migafgarcia.redditimagedownloader.reddit_json.Post;
 import com.migafgarcia.redditimagedownloader.reddit_json.RedditResponse;
 import com.migafgarcia.redditimagedownloader.reddit_json.Resolution;
@@ -42,7 +41,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
     @Override
     public ListItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.card_list_item, parent, false);
+                .inflate(R.layout.thumbnail_list_item, parent, false);
         return new ListItemViewHolder(itemView);
     }
 

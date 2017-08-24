@@ -7,6 +7,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -30,30 +31,56 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
 
     public static final String TAG = MainActivity.class.getName();
 
-    private MainPresenter mainPresenter;
+    private MainPresenter mMainPresenter;
 
-    private RecyclerView recyclerView;
-    private Toolbar toolbar;
+    private Toolbar mToolbar;
+    private RecyclerView mRecyclerView;
+    private FloatingActionButton mFloatingActionButton;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
 
     private RecyclerView.LayoutManager mLayoutManager;
-    private ListAdapter listAdapter;
-    private FloatingActionButton floatingActionButton;
-    private SwipeRefreshLayout swipeRefreshLayout;
+    private ListAdapter mListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
-        recyclerView = (RecyclerView) findViewById(R.id.main_recyclerview);
-        floatingActionButton = (FloatingActionButton) findViewById(R.id.list_fab);
-        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.list_swiperefreshlayout);
+        mMainPresenter = new MainPresenter(this, new RedditApi());
 
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        mRecyclerView = (RecyclerView) findViewById(R.id.main_recyclerview);
+        mFloatingActionButton = (FloatingActionButton) findViewById(R.id.list_fab);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.list_swiperefreshlayout);
+
+        setSupportActionBar(mToolbar);
+
+        initRecyclerView();
+
+        mFloatingActionButton.bringToFront();
+        mFloatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                scrollToStart();
+            }
+        });
+
+        mSwipeRefreshLayout.setOnRefreshListener(
+                new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        mMainPresenter.getPosts();
+                    }
+                }
+        );
+
+        mMainPresenter.getPosts();
+    }
+
+    private void initRecyclerView() {
         mLayoutManager = new LinearLayoutManager(getApplicationContext());
-        recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         ListAdapter.ItemClickCallback itemClickCallback = new ListAdapter.ItemClickCallback() {
             @Override
@@ -65,43 +92,22 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
         ListAdapter.MorePostsCallback morePostsCallback = new ListAdapter.MorePostsCallback() {
             @Override
             public void onMorePosts(String after) {
-                mainPresenter.morePosts(after);
+                mMainPresenter.morePosts(after);
             }
         };
 
-        listAdapter = new ListAdapter(getApplicationContext(), itemClickCallback, morePostsCallback);
-        recyclerView.setAdapter(listAdapter);
-
-        floatingActionButton.bringToFront();
-        floatingActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                scrollToStart();
-            }
-        });
-
-        mainPresenter = new MainPresenter(this, new RedditApi());
-
-        swipeRefreshLayout.setOnRefreshListener(
-                new SwipeRefreshLayout.OnRefreshListener() {
-                    @Override
-                    public void onRefresh() {
-                        mainPresenter.getPosts();
-                    }
-                }
-        );
-
-        mainPresenter.getPosts();
+        mListAdapter = new ListAdapter(getApplicationContext(), itemClickCallback, morePostsCallback);
+        mRecyclerView.setAdapter(mListAdapter);
     }
 
     @Override
     public void getPosts(RedditResponse response) {
-        listAdapter.getPosts(response);
+        mListAdapter.getPosts(response);
     }
 
     @Override
     public void morePosts(RedditResponse response) {
-        listAdapter.morePosts(response);
+        mListAdapter.morePosts(response);
     }
 
     @Override
@@ -111,12 +117,12 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
 
     @Override
     public void showLoading() {
-        swipeRefreshLayout.setRefreshing(true);
+        mSwipeRefreshLayout.setRefreshing(true);
     }
 
     @Override
     public void hideLoading() {
-        swipeRefreshLayout.setRefreshing(false);
+        mSwipeRefreshLayout.setRefreshing(false);
     }
 
     @Override
@@ -141,7 +147,7 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
         Intent i = new Intent(getApplicationContext(), PreviewActivity.class);
         i.putExtra("url", post.getData().getUrl());
         ActivityOptionsCompat options = ActivityOptionsCompat.
-                makeSceneTransitionAnimation(this, (View) findViewById(R.id.preview), "preview");
+                makeSceneTransitionAnimation(this, findViewById(R.id.preview), "preview");
         startActivity(i, options.toBundle());
     }
 
@@ -157,7 +163,7 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
 
     @Override
     public void scrollToStart() {
-        recyclerView.smoothScrollToPosition(0);
+        mRecyclerView.smoothScrollToPosition(0);
     }
 
 
@@ -189,26 +195,26 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
     }
 
     // TODO: 23-08-2017 use snackbar with retry action
-    class RetryGetListener implements View.OnClickListener {
+    private class RetryGetListener implements View.OnClickListener {
 
         @Override
         public void onClick(View v) {
-            mainPresenter.getPosts();
+            mMainPresenter.getPosts();
         }
     }
 
     // TODO: 23-08-2017 use snackbar with retry action
-    class RetryMoreListener implements View.OnClickListener {
+    private class RetryMoreListener implements View.OnClickListener {
 
         private String after;
 
-        public RetryMoreListener(String after) {
+        RetryMoreListener(String after) {
             this.after = after;
         }
 
         @Override
         public void onClick(View v) {
-            mainPresenter.morePosts(after);
+            mMainPresenter.morePosts(after);
         }
     }
 }

@@ -1,6 +1,5 @@
 package com.migafgarcia.redditimagedownloader;
 
-import android.app.DownloadManager;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
@@ -21,12 +20,12 @@ public class PreviewActivity extends AppCompatActivity implements PreviewScreen 
 
     public static final String TAG = PreviewActivity.class.getName();
 
-    private DownloadManager downloadManager;
-    private Uri imageUri;
+    private Uri mImageUri;
 
-    private FloatingActionButton floatingActionButton;
-    private ZoomageView preview;
-    private Toolbar toolbar;
+    private Toolbar mToolbar;
+    private ZoomageView mPreview;
+    private FloatingActionButton mFloatingActionButton;
+
 
 
     @Override
@@ -34,29 +33,34 @@ public class PreviewActivity extends AppCompatActivity implements PreviewScreen 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_preview);
 
-        toolbar = (Toolbar) findViewById(R.id.preview_toolbar);
-        setSupportActionBar(toolbar);
+        mToolbar = (Toolbar) findViewById(R.id.preview_toolbar);
+        mPreview = (ZoomageView) findViewById(R.id.preview);
+        mFloatingActionButton = (FloatingActionButton) findViewById(R.id.preview_fab);
+
+
+        setSupportActionBar(mToolbar);
+
         ActionBar ab = getSupportActionBar();
-        ab.setDisplayHomeAsUpEnabled(true);
+        if (ab != null) {
+            ab.setDisplayHomeAsUpEnabled(true);
+            ab.setDisplayShowTitleEnabled(false);
+        }
 
-        floatingActionButton = (FloatingActionButton) findViewById(R.id.preview_fab);
-        preview = (ZoomageView) findViewById(R.id.preview);
 
-        floatingActionButton.bringToFront();
+        mFloatingActionButton.bringToFront();
 
         Intent intent = getIntent();
         String url = intent.getStringExtra("url");
 
-        // TODO: 23-08-2017 load the same preview that was loaded in MainActivity due to animation
-        Picasso.with(getApplicationContext()).load(url).into(preview);
+        // TODO: 23-08-2017 load the same mPreview that was loaded in MainActivity due to animation
+        Picasso.with(getApplicationContext()).load(url).into(mPreview);
 
-        downloadManager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
-        imageUri = Uri.parse(url);
+        mImageUri = Uri.parse(url);
 
-        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+        mFloatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(Intent.ACTION_VIEW, imageUri);
+                Intent i = new Intent(Intent.ACTION_VIEW, mImageUri);
                 i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(i);
             }

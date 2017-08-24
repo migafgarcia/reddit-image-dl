@@ -4,12 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/preview_toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
-        app:layout_scrollFlags="scroll|enterAlways" />
+
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/preview_fab"
         android:layout_width="wrap_content"
@@ -24,13 +19,20 @@
 
     <com.jsibbold.zoomage.ZoomageView
         android:id="@+id/preview"
-        android:transitionName="preview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:transitionName="preview"
         app:zoomage_animateOnReset="true"
         app:zoomage_autoCenter="false"
         app:zoomage_restrictBounds="true"
         app:zoomage_translatable="true"
         app:zoomage_zoomable="true" />
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/preview_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:layout_scrollFlags="scroll|enterAlways" />
 
 </RelativeLayout>
