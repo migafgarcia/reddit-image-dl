@@ -2,6 +2,7 @@ package com.migafgarcia.redditimagedownloader;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
@@ -24,12 +25,12 @@ public class ManageSubredditsActivity extends AppCompatActivity {
 
         mRecyclerView.setHasFixedSize(true);
 
-        mLayoutManager = new LinearLayoutManager(this);
+        mLayoutManager = new GridLayoutManager(this, 2);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         ArrayList<SubredditEntry> subreddits = new ArrayList<>();
         for(int i = 0; i < 100; i++)
-            subreddits.add(new SubredditEntry(i, "asd" + i + "dfg"));
+            subreddits.add(new SubredditEntry(i, "/r/wallpaper", "https://pbs.twimg.com/profile_images/737359467742912512/t_pzvyZZ_400x400.jpg"));
 
         mAdapter = new SubredditListAdapter(getApplicationContext(), subreddits);
         mRecyclerView.setAdapter(mAdapter);
