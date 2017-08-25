@@ -36,8 +36,6 @@ public class ListAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
         after = "";
     }
 
-
-
     @Override
     public ListItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
