@@ -19,7 +19,7 @@ class ListItemViewHolder extends RecyclerView.ViewHolder {
         title = itemView.findViewById(R.id.title_textview);
         subreddit = itemView.findViewById(R.id.subreddit_textview);
         user = itemView.findViewById(R.id.user_textview);
-        preview = itemView.findViewById(R.id.preview);
+        preview = itemView.findViewById(R.id.preview_zoomage);
     }
 
 }

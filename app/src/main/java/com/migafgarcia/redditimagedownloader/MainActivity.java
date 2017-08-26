@@ -7,12 +7,12 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -26,17 +26,25 @@ import com.migafgarcia.redditimagedownloader.reddit_json.Post;
 import com.migafgarcia.redditimagedownloader.reddit_json.RedditResponse;
 import com.migafgarcia.redditimagedownloader.services.RedditApi;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
 
 public class MainActivity extends AppCompatActivity implements MainScreen {
 
     public static final String TAG = MainActivity.class.getName();
 
-    private MainPresenter mMainPresenter;
+    @BindView(R.id.main_recyclerview)
+    RecyclerView mRecyclerView;
+    @BindView(R.id.main_srl)
+    SwipeRefreshLayout mSwipeRefreshLayout;
+    @BindView(R.id.main_fab)
+    FloatingActionButton mFloatingActionButton;
+    @BindView(R.id.main_toolbar)
+    Toolbar mToolbar;
 
-    private Toolbar mToolbar;
-    private RecyclerView mRecyclerView;
-    private FloatingActionButton mFloatingActionButton;
-    private SwipeRefreshLayout mSwipeRefreshLayout;
+    private MainPresenter mMainPresenter;
 
     private RecyclerView.LayoutManager mLayoutManager;
     private ListAdapter mListAdapter;
@@ -45,25 +53,15 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
 
         mMainPresenter = new MainPresenter(this, new RedditApi());
-
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        mRecyclerView = (RecyclerView) findViewById(R.id.main_recyclerview);
-        mFloatingActionButton = (FloatingActionButton) findViewById(R.id.list_fab);
-        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.list_swiperefreshlayout);
 
         setSupportActionBar(mToolbar);
 
         initRecyclerView();
 
         mFloatingActionButton.bringToFront();
-        mFloatingActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                scrollToStart();
-            }
-        });
 
         mSwipeRefreshLayout.setOnRefreshListener(
                 new SwipeRefreshLayout.OnRefreshListener() {
@@ -78,6 +76,8 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
     }
 
     private void initRecyclerView() {
+        if(mRecyclerView == null)
+            Log.e(TAG, "RecyclerView is null");
         mLayoutManager = new LinearLayoutManager(getApplicationContext());
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -144,10 +144,10 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
 
     @Override
     public void launchPreview(Post post) {
-        Intent i = new Intent(getApplicationContext(), PreviewActivity.class);
-        i.putExtra("url", post.getData().getUrl());
+        Intent i = new Intent(MainActivity.this, PreviewActivity.class);
+        i.putExtra("Post", post);
         ActivityOptionsCompat options = ActivityOptionsCompat.
-                makeSceneTransitionAnimation(this, findViewById(R.id.preview), "preview");
+                makeSceneTransitionAnimation(this, findViewById(R.id.preview_zoomage), "preview");
         startActivity(i, options.toBundle());
     }
 
@@ -194,7 +194,11 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
         return getApplicationContext();
     }
 
-    // TODO: 23-08-2017 use snackbar with retry action
+    @OnClick(R.id.main_fab)
+    public void onFloatingActionButtonClicked() {
+        scrollToStart();
+    }
+
     private class RetryGetListener implements View.OnClickListener {
 
         @Override
@@ -203,7 +207,6 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
         }
     }
 
-    // TODO: 23-08-2017 use snackbar with retry action
     private class RetryMoreListener implements View.OnClickListener {
 
         private String after;

@@ -1,10 +1,13 @@
 
 package com.migafgarcia.redditimagedownloader.reddit_json;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Data_ {
+public class Data_ implements Parcelable {
 
     public static final String TAG = Data_.class.getName();
 
@@ -143,4 +146,65 @@ public class Data_ {
     public Preview getPreview() {
         return preview;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeValue(this.thumbnailWidth);
+        dest.writeString(this.subreddit);
+        dest.writeString(this.id);
+        dest.writeString(this.title);
+        dest.writeString(this.score);
+        dest.writeValue(this.over18);
+        dest.writeString(this.thumbnail);
+        dest.writeString(this.subredditId);
+        dest.writeString(this.postHint);
+        dest.writeValue(this.thumbnailHeight);
+        dest.writeString(this.permalink);
+        dest.writeValue(this.locked);
+        dest.writeValue(this.created);
+        dest.writeString(this.url);
+        dest.writeString(this.author);
+        dest.writeValue(this.createdUtc);
+        dest.writeParcelable(this.preview, flags);
+    }
+
+    public Data_() {
+    }
+
+    protected Data_(Parcel in) {
+        this.thumbnailWidth = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.subreddit = in.readString();
+        this.id = in.readString();
+        this.title = in.readString();
+        this.score = in.readString();
+        this.over18 = (Boolean) in.readValue(Boolean.class.getClassLoader());
+        this.thumbnail = in.readString();
+        this.subredditId = in.readString();
+        this.postHint = in.readString();
+        this.thumbnailHeight = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.permalink = in.readString();
+        this.locked = (Boolean) in.readValue(Boolean.class.getClassLoader());
+        this.created = (Float) in.readValue(Float.class.getClassLoader());
+        this.url = in.readString();
+        this.author = in.readString();
+        this.createdUtc = (Float) in.readValue(Float.class.getClassLoader());
+        this.preview = in.readParcelable(Preview.class.getClassLoader());
+    }
+
+    public static final Parcelable.Creator<Data_> CREATOR = new Parcelable.Creator<Data_>() {
+        @Override
+        public Data_ createFromParcel(Parcel source) {
+            return new Data_(source);
+        }
+
+        @Override
+        public Data_[] newArray(int size) {
+            return new Data_[size];
+        }
+    };
 }

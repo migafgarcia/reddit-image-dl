@@ -18,7 +18,7 @@
         app:srcCompat="@drawable/ic_file_download_black_24dp" />
 
     <com.jsibbold.zoomage.ZoomageView
-        android:id="@+id/preview"
+        android:id="@+id/preview_zoomage"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:transitionName="preview"

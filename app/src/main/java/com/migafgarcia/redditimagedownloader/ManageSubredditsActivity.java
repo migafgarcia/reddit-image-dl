@@ -5,11 +5,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import com.migafgarcia.redditimagedownloader.adapters.SubredditListAdapter;
-import com.migafgarcia.redditimagedownloader.db.SubredditsContract;
+import com.migafgarcia.redditimagedownloader.db.SubredditEntry;
 import com.migafgarcia.redditimagedownloader.db.SubredditsDbHelper;
 
 import java.util.ArrayList;
@@ -32,23 +31,23 @@ public class ManageSubredditsActivity extends AppCompatActivity {
         mLayoutManager = new GridLayoutManager(this, 2);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        ArrayList<SubredditEntry> subreddits = new ArrayList<>();
+        ArrayList<com.migafgarcia.redditimagedownloader.SubredditEntry> subreddits = new ArrayList<>();
 
 
         SubredditsDbHelper helper = new SubredditsDbHelper(getApplicationContext());
         SQLiteDatabase db = helper.getReadableDatabase();
 
         String[] projection = {
-                SubredditsContract.SubredditEntry._ID,
-                SubredditsContract.SubredditEntry.COLUMN_NAME_NAME,
-                SubredditsContract.SubredditEntry.COLUMN_NAME_URL,
-                SubredditsContract.SubredditEntry.COLUMN_NAME_ACTIVATED
+                SubredditEntry._ID,
+                SubredditEntry.COLUMN_NAME_NAME,
+                SubredditEntry.COLUMN_NAME_URL,
+                SubredditEntry.COLUMN_NAME_ACTIVATED
         };
 
 
 
         Cursor cursor = db.query(
-                SubredditsContract.SubredditEntry.TABLE_NAME,                     // The table to query
+                SubredditEntry.TABLE_NAME,                     // The table to query
                 projection,                               // The columns to return
                 null,                                // The columns for the WHERE clause
                 null,                            // The values for the WHERE clause
@@ -59,15 +58,15 @@ public class ManageSubredditsActivity extends AppCompatActivity {
 
         while(cursor.moveToNext()) {
             long itemId = cursor.getLong(
-                    cursor.getColumnIndexOrThrow(SubredditsContract.SubredditEntry._ID));
+                    cursor.getColumnIndexOrThrow(SubredditEntry._ID));
             String name = cursor.getString(
-                    cursor.getColumnIndexOrThrow(SubredditsContract.SubredditEntry.COLUMN_NAME_NAME));
+                    cursor.getColumnIndexOrThrow(SubredditEntry.COLUMN_NAME_NAME));
             String url = cursor.getString(
-                    cursor.getColumnIndexOrThrow(SubredditsContract.SubredditEntry.COLUMN_NAME_URL));
+                    cursor.getColumnIndexOrThrow(SubredditEntry.COLUMN_NAME_URL));
             int activated = cursor.getInt(
-                    cursor.getColumnIndexOrThrow(SubredditsContract.SubredditEntry.COLUMN_NAME_ACTIVATED));
+                    cursor.getColumnIndexOrThrow(SubredditEntry.COLUMN_NAME_ACTIVATED));
 
-            subreddits.add(new SubredditEntry((int) itemId, name, "https://pbs.twimg.com/profile_images/737359467742912512/t_pzvyZZ_400x400.jpg"));
+            subreddits.add(new com.migafgarcia.redditimagedownloader.SubredditEntry((int) itemId, name, "https://pbs.twimg.com/profile_images/737359467742912512/t_pzvyZZ_400x400.jpg"));
         }
         cursor.close();
 

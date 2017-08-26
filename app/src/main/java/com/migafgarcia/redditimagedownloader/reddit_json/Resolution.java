@@ -1,10 +1,13 @@
 package com.migafgarcia.redditimagedownloader.reddit_json;
 
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Resolution {
+public class Resolution implements Parcelable {
 
     public static final String TAG = Resolution.class.getName();
 
@@ -31,4 +34,37 @@ public class Resolution {
     public Integer getHeight() {
         return height;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.url);
+        dest.writeValue(this.width);
+        dest.writeValue(this.height);
+    }
+
+    public Resolution() {
+    }
+
+    protected Resolution(Parcel in) {
+        this.url = in.readString();
+        this.width = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.height = (Integer) in.readValue(Integer.class.getClassLoader());
+    }
+
+    public static final Parcelable.Creator<Resolution> CREATOR = new Parcelable.Creator<Resolution>() {
+        @Override
+        public Resolution createFromParcel(Parcel source) {
+            return new Resolution(source);
+        }
+
+        @Override
+        public Resolution[] newArray(int size) {
+            return new Resolution[size];
+        }
+    };
 }
