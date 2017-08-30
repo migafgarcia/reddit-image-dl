@@ -22,8 +22,8 @@ public class SubredditsDbHelper extends SQLiteOpenHelper {
     private static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + SubredditEntry.TABLE_NAME;
 
-    public static final int DATABASE_VERSION = 1;
-    public static final String DATABASE_NAME = "Subreddits.db";
+    private static final int DATABASE_VERSION = 1;
+    private static final String DATABASE_NAME = "Subreddits.db";
 
     public SubredditsDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);

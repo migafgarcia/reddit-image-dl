@@ -146,10 +146,14 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
     public void launchPreview(Post post) {
         Intent i = new Intent(MainActivity.this, PreviewActivity.class);
         i.putExtra("Post", post);
+        i.setFlags(Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP);
+        // TODO: 29-08-2017 fix transition;
         ActivityOptionsCompat options = ActivityOptionsCompat.
                 makeSceneTransitionAnimation(this, findViewById(R.id.preview_zoomage), "preview");
         startActivity(i, options.toBundle());
     }
+
+
 
     @Override
     public void launchSettings() {

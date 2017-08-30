@@ -1,7 +1,9 @@
 package com.migafgarcia.redditimagedownloader.adapters;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.util.Log;
@@ -72,10 +74,16 @@ public class ListAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
             url = Html.fromHtml(current.getUrl()).toString();
         }
 
-        Picasso.with(context).
-                load(url).
-                placeholder(R.color.cardview_dark_background).
-                into(holder.preview);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        if (!prefs.getBoolean("nsfw_switch", false) && post.getData().getOver18())
+            Picasso.with(context).
+                    load(url).
+                    placeholder(R.color.cardview_dark_background);
+        else
+            Picasso.with(context).
+                    load(url).
+                    placeholder(R.color.cardview_dark_background).
+                    into(holder.preview);
 
         holder.preview.setOnClickListener(new View.OnClickListener() {
             @Override
