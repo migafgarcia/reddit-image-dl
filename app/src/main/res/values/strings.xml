@@ -13,4 +13,6 @@
     <string name="action_set_as">Set as...</string>
     <string name="action_thread">Go to Thread</string>
     <string name="action_subreddit">Go to subreddit</string>
+    <string name="action_share">Share</string>
+    <string name="action_clear_downloads">Clear downloads</string>
 </resources>

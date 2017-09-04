@@ -1,39 +1,46 @@
 package com.migafgarcia.redditimagedownloader;
 
 import android.Manifest;
-import android.app.DownloadManager;
-import android.content.BroadcastReceiver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.PopupWindow;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.jsibbold.zoomage.ZoomageView;
-import com.migafgarcia.redditimagedownloader.db.*;
+import com.migafgarcia.redditimagedownloader.db.DownloadsDbHelper;
 import com.migafgarcia.redditimagedownloader.presenters.PreviewPresenter;
 import com.migafgarcia.redditimagedownloader.presenters.PreviewScreen;
 import com.migafgarcia.redditimagedownloader.reddit_json.Post;
 import com.migafgarcia.redditimagedownloader.reddit_json.Resolution;
 import com.squareup.picasso.Picasso;
+import com.tonyodev.fetch.Fetch;
+import com.tonyodev.fetch.listener.FetchListener;
+import com.tonyodev.fetch.request.Request;
+import com.tonyodev.fetch.request.RequestInfo;
 
 import java.io.File;
 import java.util.List;
@@ -42,15 +49,21 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class PreviewActivity extends AppCompatActivity implements PreviewScreen {
+public class PreviewActivity extends AppCompatActivity implements PreviewScreen, FetchListener {
 
-    public static final String TAG = PreviewActivity.class.getName();
+    private static final String TAG = PreviewActivity.class.getName();
+    private static final int WRITE_EXTERNAL_STORAGE_CODE = 1234;
+
     @BindView(R.id.preview_fab)
     FloatingActionButton mFloatingActionButton;
     @BindView(R.id.preview_zoomage)
     ZoomageView mZoomageView;
     @BindView(R.id.preview_toolbar)
     Toolbar mToolbar;
+    @BindView(R.id.preview_rl)
+    RelativeLayout relativeLayout;
+
+    ProgressBar progressBar;
 
     private Post mPost;
 
@@ -58,11 +71,16 @@ public class PreviewActivity extends AppCompatActivity implements PreviewScreen 
 
     private DownloadsDbHelper helper;
 
-    private Uri localFileUri;
+    private Fetch fetch;
 
-    private long downloadId = -1;
+    private PopupWindow popupWindow;
 
-    private BroadcastReceiver onDownloadComplete;
+    private long downloadId = Fetch.ENQUEUE_ERROR_ID;
+
+    private String filePath;
+
+    private boolean setAs = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,12 +88,18 @@ public class PreviewActivity extends AppCompatActivity implements PreviewScreen 
         setContentView(R.layout.activity_preview);
         ButterKnife.bind(this);
 
-
         helper = new DownloadsDbHelper(getApplicationContext());
-
-        logDb();
-
         previewPresenter = new PreviewPresenter();
+        fetch = Fetch.newInstance(this);
+
+        Bundle b = getIntent().getBundleExtra("bundle");
+        mPost = b.getParcelable("Post");
+
+        filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/RedditImageDownloader/" + Uri.parse(mPost.getData().getUrl()).getLastPathSegment();
+
+        loadPreview();
+
+        initPopup();
 
         setSupportActionBar(mToolbar);
 
@@ -85,58 +109,55 @@ public class PreviewActivity extends AppCompatActivity implements PreviewScreen 
             ab.setDisplayShowTitleEnabled(false);
         }
 
-
         mFloatingActionButton.bringToFront();
 
-        mPost = getIntent().getParcelableExtra("Post");
+    }
 
-        loadPreview();
+    @Override
+    protected void onResume() {
+        super.onResume();
 
-        String location = getLocation();
+        if (downloadId != Fetch.ENQUEUE_ERROR_ID) {
 
-        if(location != null)
-            localFileUri = Uri.parse(location);
-        else
-            localFileUri = null;
+            RequestInfo info = fetch.get(downloadId);
 
-
-
-        onDownloadComplete = new MyBroadcastReceiver(mPost) {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-
-                Long dwnId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
-                if(dwnId == downloadId)
-                    Log.d(TAG, "SAME ACTIVITY");
-                else
-                    Log.d(TAG, "DIFFERENT ACTIVITY");
-
-                SQLiteDatabase db = helper.getReadableDatabase();
-                ContentValues download = new ContentValues();
-                download.put(DownloadEntry.COLUMN_NAME_POST_ID, mPost.getData().getId());
-                download.put(DownloadEntry.COLUMN_NAME_LOCATION, localFileUri.toString());
-                download.put(DownloadEntry.COLUMN_NAME_URL, mPost.getData().getUrl());
-                db.insert(DownloadEntry.TABLE_NAME, null, download);
-                db.close();
-
-                downloadId = -1;
+            if (info != null) {
+                popupWindow.showAtLocation(relativeLayout, Gravity.CENTER, 0, 0);
+                progressBar.setProgress(info.getProgress());
+                Log.d(TAG, "POPUP");
             }
-        };
 
+            fetch.addFetchListener(this);
+        }
+    }
 
-        /*
+    @Override
+    protected void onPause() {
+        super.onPause();
+        fetch.removeFetchListener(this);
+        popupWindow.dismiss();
+    }
 
-        imageUri = Uri.parse(mPost.getData().getUrl());
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        fetch.release();
+    }
 
-        downloadFileUri = Uri.fromFile(new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), imageUri.getLastPathSegment()));
+    private void enqueueDownload() {
 
-        downloadContentUri = FileProvider.getUriForFile(
-                this,
-                getApplicationContext()
-                        .getPackageName() + ".provider", new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), imageUri.getLastPathSegment()));
+        String url = mPost.getData().getUrl();
 
+        Request request = new Request(url, filePath);
 
-        */
+        downloadId = fetch.enqueue(request);
+
+        if (downloadId != Fetch.ENQUEUE_ERROR_ID) {
+            popupWindow.showAtLocation(relativeLayout, Gravity.CENTER, 0, 0);
+            progressBar.setIndeterminate(true);
+        }
+
+        fetch.addFetchListener(this);
 
     }
 
@@ -145,8 +166,8 @@ public class PreviewActivity extends AppCompatActivity implements PreviewScreen 
         int currentWidth = 0;
         Resolution current = resolutions.get(0);
 
-        for(Resolution res : resolutions)
-            if(res.getWidth() > currentWidth)
+        for (Resolution res : resolutions)
+            if (res.getWidth() > currentWidth)
                 current = res;
 
         // TODO: 18-08-2017 find alternative non-deprecated function
@@ -157,109 +178,60 @@ public class PreviewActivity extends AppCompatActivity implements PreviewScreen 
         Picasso.with(getApplicationContext()).load(url).into(mZoomageView);
     }
 
-    private void logDb() {
-
-        SQLiteDatabase db = helper.getReadableDatabase();
-
-        String[] projection = {
-                DownloadEntry.COLUMN_NAME_POST_ID,
-                DownloadEntry.COLUMN_NAME_LOCATION,
-                DownloadEntry.COLUMN_NAME_URL
-        };
-
-
-
-        Cursor cursor = db.query(
-                DownloadEntry.TABLE_NAME,                     // The table to query
-                projection,                               // The columns to return
-                null,                                // The columns for the WHERE clause
-                null,                            // The values for the WHERE clause
-                null,                                     // don't group the rows
-                null,                                     // don't filter by row groups
-                null                                 // The sort order
-        );
-
-        StringBuilder str = new StringBuilder();
-        while(cursor.moveToNext()) {
-            String id = cursor.getString(cursor.getColumnIndexOrThrow(DownloadEntry.COLUMN_NAME_POST_ID));
-            String location = cursor.getString(cursor.getColumnIndexOrThrow(DownloadEntry.COLUMN_NAME_LOCATION));
-            String url = cursor.getString(cursor.getColumnIndexOrThrow(DownloadEntry.COLUMN_NAME_URL));
-            str.append("ID = " + id + "; LOCATION = " + location + "; URL = " + url + ";\n");
-        }
-        Log.d(TAG, str.toString());
-        cursor.close();
-        db.close();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        unregisterReceiver(onDownloadComplete);
-
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        registerReceiver(onDownloadComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
-    }
-
     @Override
     public void downloadImage() {
 
-        if(downloadId != -1) {
-            Toast.makeText(this, "Already downloading...", Toast.LENGTH_SHORT).show();
+        File file = new File(filePath);
+
+        if(file.exists()) {
+            Toast.makeText(this, "Already downloaded", Toast.LENGTH_SHORT).show();
             return;
         }
-        Uri imageUri = Uri.parse(mPost.getData().getUrl());
 
-        DownloadManager.Request request = new DownloadManager.Request(imageUri);
-        request.setDescription(mPost.getData().getAuthor());
-        request.setTitle(mPost.getData().getTitle());
-        request.allowScanningByMediaScanner();
-        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-
-
-        if(localFileUri != null)
-            request.setDestinationUri(localFileUri);
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    WRITE_EXTERNAL_STORAGE_CODE);
+        }
         else {
-            localFileUri = Uri.fromFile(new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), imageUri.getLastPathSegment()));
-            request.setDestinationUri(localFileUri);
+            enqueueDownload();
         }
-        request.setVisibleInDownloadsUi(true);
-        DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
 
-        if(isStoragePermissionGranted()) {
-            downloadId = manager.enqueue(request);
-            Toast.makeText(this, "Downloading image...", Toast.LENGTH_SHORT).show();
-            /*
-            SQLiteDatabase db = helper.getReadableDatabase();
-            ContentValues download = new ContentValues();
-            download.put(DownloadEntry.COLUMN_NAME_POST_ID, mPost.getData().getId());
-            download.put(DownloadEntry.COLUMN_NAME_LOCATION, localFileUri.toString());
-            download.put(DownloadEntry.COLUMN_NAME_URL, mPost.getData().getUrl());
-            db.insert(DownloadEntry.TABLE_NAME, null, download);
-            db.close();
-            */
+    }
+
+    private void initPopup() {
+        LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+
+        // Inflate the custom layout/view
+        View popupView = inflater.inflate(R.layout.download_overlay, null);
+
+        popupWindow = new PopupWindow(
+                popupView,
+                LayoutParams.MATCH_PARENT,
+                LayoutParams.MATCH_PARENT,
+                true
+        );
+
+        if (Build.VERSION.SDK_INT >= 21) {
+            popupWindow.setElevation(5.0f);
         }
+
+        progressBar = popupView.findViewById(R.id.progressBar);
     }
 
     @Override
     public void setAs() {
+        setAs = false;
 
-        if(localFileUri == null) {
-            Toast.makeText(this, "Download image first", Toast.LENGTH_LONG).show();
-            return;
-        }
+        File file = new File(filePath);
 
-        Uri downloadContentUri = FileProvider.getUriForFile(
-                this,
-                getApplicationContext()
-                        .getPackageName() + ".provider", new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), Uri.parse(mPost.getData().getUrl()).getLastPathSegment()));
-
-        File file = new File(localFileUri.getPath());
-
-        if(file.exists()) {
+        if (file.exists()) {
+            Uri downloadContentUri = FileProvider.getUriForFile(
+                    this,
+                    getApplicationContext()
+                            .getPackageName() + ".provider", file);
             Intent intent = new Intent(Intent.ACTION_ATTACH_DATA);
             intent.addCategory(Intent.CATEGORY_DEFAULT);
             intent.setDataAndType(downloadContentUri, "image/*");
@@ -267,33 +239,36 @@ public class PreviewActivity extends AppCompatActivity implements PreviewScreen 
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
             startActivity(Intent.createChooser(intent, "Set as:"));
+        } else {
+            setAs = true;
+            downloadImage();
         }
-        else
-            Log.d(TAG, "DOESN'T EXISTS");
-
     }
 
     @Override
-    public boolean onSupportNavigateUp(){
+    public boolean onSupportNavigateUp() {
         finish();
         return true;
     }
 
     @Override
     public void goToThread() {
-        Intent intent= new Intent(Intent.ACTION_VIEW,Uri.parse("https://www.reddit.com" + mPost.getData().getPermalink()));
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.reddit.com" + mPost.getData().getPermalink()));
         startActivity(intent);
     }
 
     @Override
     public void goToSubreddit() {
-        Intent intent= new Intent(Intent.ACTION_VIEW,Uri.parse("https://www.reddit.com/r/" + mPost.getData().getSubreddit()));
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.reddit.com/r/" + mPost.getData().getSubreddit()));
         startActivity(intent);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.action_share:
+                share();
+                return true;
             case R.id.action_set_as:
                 setAs();
                 return true;
@@ -305,31 +280,15 @@ public class PreviewActivity extends AppCompatActivity implements PreviewScreen 
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
-
         }
     }
 
-    public boolean isStoragePermissionGranted() {
-        if (Build.VERSION.SDK_INT >= 23) {
-            if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    == PackageManager.PERMISSION_GRANTED)
-                return true;
-            else {
-                Log.v(TAG, "Permission is revoked");
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-                return false;
-            }
-        }
-        else
-            return true;
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(grantResults[0]== PackageManager.PERMISSION_GRANTED){
-            downloadImage();
-        }
+    private void share() {
+        Intent i = new Intent(Intent.ACTION_SEND);
+        i.setType("text/plain");
+        i.putExtra(Intent.EXTRA_SUBJECT, "Sharing URL");
+        i.putExtra(Intent.EXTRA_TEXT, mPost.getData().getUrl());
+        startActivity(Intent.createChooser(i, "Share URL"));
     }
 
     @Override
@@ -344,43 +303,88 @@ public class PreviewActivity extends AppCompatActivity implements PreviewScreen 
         downloadImage();
     }
 
-    public String getLocation() {
-
-        if(helper == null)
-            Log.d(TAG, "IS NULL YO");
-
-        SQLiteDatabase db = helper.getReadableDatabase();
-
-        String[] projection = {
-                DownloadEntry.COLUMN_NAME_LOCATION,
-        };
-
-        String selection = DownloadEntry.COLUMN_NAME_POST_ID+ " = ?";
-
-        String[] selectionArgs = {mPost.getData().getId()};
-
-
-        Cursor cursor = db.query(
-                DownloadEntry.TABLE_NAME,                     // The table to query
-                projection,                               // The columns to return
-                selection,                                // The columns for the WHERE clause
-                selectionArgs,                            // The values for the WHERE clause
-                null,                                     // don't group the rows
-                null,                                     // don't filter by row groups
-                null                                 // The sort order
-        );
-
-        cursor.moveToFirst();
-
-        String location = null;
-        if(cursor.getCount() > 0)
-            location = cursor.getString(cursor.getColumnIndexOrThrow(DownloadEntry.COLUMN_NAME_LOCATION));
-
-
-        Log.d(TAG, "Image in DB: " + location);
-        cursor.close();
-        db.close();
-
-        return location;
+    @Override
+    public Context getContext() {
+        return this;
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+
+        if (requestCode == WRITE_EXTERNAL_STORAGE_CODE || grantResults.length > 0
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            enqueueDownload();
+        } else {
+            Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onUpdate(long id, int status, int progress, long downloadedBytes, long fileSize, int error) {
+        if (id == downloadId) {
+            switch (status) {
+                case Fetch.STATUS_DONE:
+                    Log.d(TAG, "STATUS_DONE");
+                    progressBar.setProgress(100);
+                    popupWindow.dismiss();
+                    downloadSuccessful();
+                    if (setAs)
+                        setAs();
+                    break;
+                case Fetch.STATUS_DOWNLOADING:
+                    Log.d(TAG, "STATUS_DOWNLOADING Progress: " + progress);
+                    progressBar.setIndeterminate(false);
+                    progressBar.setProgress(progress);
+                    break;
+                case Fetch.STATUS_ERROR:
+                    Log.d(TAG, "STATUS_ERROR");
+                    popupWindow.dismiss();
+                    downloadFailed();
+                    break;
+                case Fetch.STATUS_NOT_QUEUED:
+                    Log.d(TAG, "STATUS_NOT_QUEUED");
+                    progressBar.setIndeterminate(true);
+                    break;
+                case Fetch.STATUS_PAUSED:
+                    Log.d(TAG, "STATUS_PAUSED");
+                    progressBar.setProgress(progress);
+                    break;
+                case Fetch.STATUS_QUEUED:
+                    Log.d(TAG, "STATUS_QUEUED");
+                    progressBar.setIndeterminate(true);
+                    break;
+                case Fetch.STATUS_REMOVED:
+                    Log.d(TAG, "STATUS_REMOVED");
+                    popupWindow.dismiss();
+                    downloadRemoved();
+                    break;
+                default:
+                    Log.d(TAG, "STATUS_UNKNOWN");
+                    popupWindow.dismiss();
+                    downloadUnknown();
+                    break;
+            }
+        }
+    }
+
+    private void downloadUnknown() {
+        Toast.makeText(this, "Unknown error", Toast.LENGTH_LONG).show();
+    }
+
+    private void downloadRemoved() {
+        Toast.makeText(this, "Download removed", Toast.LENGTH_LONG).show();
+    }
+
+    private void downloadFailed() {
+        Toast.makeText(this, "Download failed", Toast.LENGTH_LONG).show();
+    }
+
+    private void downloadSuccessful() {
+        Intent intent =
+                new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        intent.setData(Uri.fromFile(new File(filePath)));
+        sendBroadcast(intent);
+        Toast.makeText(this, "Download complete", Toast.LENGTH_LONG).show();
+    }
+
 }

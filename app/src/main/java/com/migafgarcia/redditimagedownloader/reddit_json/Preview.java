@@ -13,14 +13,32 @@ import java.util.List;
 public class Preview implements Parcelable {
 
     public static final String TAG = Preview.class.getName();
+    public static final Parcelable.Creator<Preview> CREATOR = new Parcelable.Creator<Preview>() {
+        @Override
+        public Preview createFromParcel(Parcel source) {
+            return new Preview(source);
+        }
 
+        @Override
+        public Preview[] newArray(int size) {
+            return new Preview[size];
+        }
+    };
     @SerializedName("images")
     @Expose
     private List<Image> images = null;
-
     @SerializedName("enabled")
     @Expose
     private Boolean enabled;
+
+    public Preview() {
+    }
+
+    protected Preview(Parcel in) {
+        this.images = new ArrayList<Image>();
+        in.readList(this.images, Image.class.getClassLoader());
+        this.enabled = (Boolean) in.readValue(Boolean.class.getClassLoader());
+    }
 
     public List<Image> getImages() {
         return images;
@@ -40,25 +58,4 @@ public class Preview implements Parcelable {
         dest.writeList(this.images);
         dest.writeValue(this.enabled);
     }
-
-    public Preview() {
-    }
-
-    protected Preview(Parcel in) {
-        this.images = new ArrayList<Image>();
-        in.readList(this.images, Image.class.getClassLoader());
-        this.enabled = (Boolean) in.readValue(Boolean.class.getClassLoader());
-    }
-
-    public static final Parcelable.Creator<Preview> CREATOR = new Parcelable.Creator<Preview>() {
-        @Override
-        public Preview createFromParcel(Parcel source) {
-            return new Preview(source);
-        }
-
-        @Override
-        public Preview[] newArray(int size) {
-            return new Preview[size];
-        }
-    };
 }

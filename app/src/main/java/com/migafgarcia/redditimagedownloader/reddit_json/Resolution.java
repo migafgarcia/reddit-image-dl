@@ -10,18 +10,35 @@ import com.google.gson.annotations.SerializedName;
 public class Resolution implements Parcelable {
 
     public static final String TAG = Resolution.class.getName();
+    public static final Parcelable.Creator<Resolution> CREATOR = new Parcelable.Creator<Resolution>() {
+        @Override
+        public Resolution createFromParcel(Parcel source) {
+            return new Resolution(source);
+        }
 
+        @Override
+        public Resolution[] newArray(int size) {
+            return new Resolution[size];
+        }
+    };
     @SerializedName("url")
     @Expose
     private String url;
-
     @SerializedName("width")
     @Expose
     private Integer width;
-
     @SerializedName("height")
     @Expose
     private Integer height;
+
+    public Resolution() {
+    }
+
+    protected Resolution(Parcel in) {
+        this.url = in.readString();
+        this.width = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.height = (Integer) in.readValue(Integer.class.getClassLoader());
+    }
 
     public String getUrl() {
         return url;
@@ -46,25 +63,4 @@ public class Resolution implements Parcelable {
         dest.writeValue(this.width);
         dest.writeValue(this.height);
     }
-
-    public Resolution() {
-    }
-
-    protected Resolution(Parcel in) {
-        this.url = in.readString();
-        this.width = (Integer) in.readValue(Integer.class.getClassLoader());
-        this.height = (Integer) in.readValue(Integer.class.getClassLoader());
-    }
-
-    public static final Parcelable.Creator<Resolution> CREATOR = new Parcelable.Creator<Resolution>() {
-        @Override
-        public Resolution createFromParcel(Parcel source) {
-            return new Resolution(source);
-        }
-
-        @Override
-        public Resolution[] newArray(int size) {
-            return new Resolution[size];
-        }
-    };
 }

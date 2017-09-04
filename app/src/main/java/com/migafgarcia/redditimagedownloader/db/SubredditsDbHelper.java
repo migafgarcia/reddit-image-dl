@@ -5,12 +5,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class SubredditsDbHelper extends SQLiteOpenHelper {
-
-    private String[] defaultSubreddits = {"EarthPorn", "ExposurePorn", "ImaginaryLandscapes", "ImaginaryTechnology", "LightGraffiti", "SkyPorn", "futureporn", "lightpainting", "wallpaper", "wallpapers", "cyberpunk", "PsychedelicWallpapers", "ultrahdwallpapers"};
 
     private static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + SubredditEntry.TABLE_NAME + " (" +
@@ -18,12 +13,11 @@ public class SubredditsDbHelper extends SQLiteOpenHelper {
                     SubredditEntry.COLUMN_NAME_NAME + " TEXT," +
                     SubredditEntry.COLUMN_NAME_URL + " TEXT," +
                     SubredditEntry.COLUMN_NAME_ACTIVATED + " INTEGER)";
-
     private static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + SubredditEntry.TABLE_NAME;
-
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "Subreddits.db";
+    private String[] defaultSubreddits = {"EarthPorn", "ExposurePorn", "ImaginaryLandscapes", "ImaginaryTechnology", "LightGraffiti", "SkyPorn", "futureporn", "lightpainting", "wallpaper", "wallpapers", "cyberpunk", "PsychedelicWallpapers", "ultrahdwallpapers"};
 
     public SubredditsDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -33,7 +27,7 @@ public class SubredditsDbHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL(SQL_CREATE_ENTRIES);
         ContentValues current = new ContentValues();
-        for(String s : defaultSubreddits) {
+        for (String s : defaultSubreddits) {
             current.put(SubredditEntry.COLUMN_NAME_NAME, s);
             current.put(SubredditEntry.COLUMN_NAME_URL, "https://reddit.com/r/" + s);
             current.put(SubredditEntry.COLUMN_NAME_ACTIVATED, 1);

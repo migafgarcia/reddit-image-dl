@@ -6,15 +6,15 @@ public class SubredditEntry {
     private String mSubreddit;
     private String imageUrl;
 
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
     public SubredditEntry(int mId, String mSubreddit, String imageUrl) {
         this.mId = mId;
         this.mSubreddit = mSubreddit;
         this.imageUrl = imageUrl;
 
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
     }
 
     public int getmId() {

@@ -9,14 +9,31 @@ import com.google.gson.annotations.SerializedName;
 public class Post implements Parcelable {
 
     public static final String TAG = Post.class.getName();
+    public static final Parcelable.Creator<Post> CREATOR = new Parcelable.Creator<Post>() {
+        @Override
+        public Post createFromParcel(Parcel source) {
+            return new Post(source);
+        }
 
+        @Override
+        public Post[] newArray(int size) {
+            return new Post[size];
+        }
+    };
     @SerializedName("kind")
     @Expose
     private String kind;
-
     @SerializedName("data")
     @Expose
     private Data_ data;
+
+    public Post() {
+    }
+
+    protected Post(Parcel in) {
+        this.kind = in.readString();
+        this.data = in.readParcelable(Data_.class.getClassLoader());
+    }
 
     public String getKind() {
         return kind;
@@ -36,24 +53,4 @@ public class Post implements Parcelable {
         dest.writeString(this.kind);
         dest.writeParcelable(this.data, flags);
     }
-
-    public Post() {
-    }
-
-    protected Post(Parcel in) {
-        this.kind = in.readString();
-        this.data = in.readParcelable(Data_.class.getClassLoader());
-    }
-
-    public static final Parcelable.Creator<Post> CREATOR = new Parcelable.Creator<Post>() {
-        @Override
-        public Post createFromParcel(Parcel source) {
-            return new Post(source);
-        }
-
-        @Override
-        public Post[] newArray(int size) {
-            return new Post[size];
-        }
-    };
 }

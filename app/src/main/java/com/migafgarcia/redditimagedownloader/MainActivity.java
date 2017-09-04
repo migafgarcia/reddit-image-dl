@@ -1,12 +1,15 @@
 package com.migafgarcia.redditimagedownloader;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
+import android.os.PersistableBundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -25,6 +28,7 @@ import com.migafgarcia.redditimagedownloader.presenters.MainScreen;
 import com.migafgarcia.redditimagedownloader.reddit_json.Post;
 import com.migafgarcia.redditimagedownloader.reddit_json.RedditResponse;
 import com.migafgarcia.redditimagedownloader.services.RedditApi;
+import com.tonyodev.fetch.Fetch;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -48,6 +52,9 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
 
     private RecyclerView.LayoutManager mLayoutManager;
     private ListAdapter mListAdapter;
+
+    public static final int OPEN_NEW_ACTIVITY = 151;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,10 +80,12 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
         );
 
         mMainPresenter.getPosts();
+
     }
 
+
     private void initRecyclerView() {
-        if(mRecyclerView == null)
+        if (mRecyclerView == null)
             Log.e(TAG, "RecyclerView is null");
         mLayoutManager = new LinearLayoutManager(getApplicationContext());
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -144,25 +153,64 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
 
     @Override
     public void launchPreview(Post post) {
-        Intent i = new Intent(MainActivity.this, PreviewActivity.class);
-        i.putExtra("Post", post);
-        i.setFlags(Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP);
-        // TODO: 29-08-2017 fix transition;
-        ActivityOptionsCompat options = ActivityOptionsCompat.
-                makeSceneTransitionAnimation(this, findViewById(R.id.preview_zoomage), "preview");
-        startActivity(i, options.toBundle());
+        Bundle b = new Bundle();
+        b.putParcelable("Post", post);
+        Intent intent = new Intent(MainActivity.this, PreviewActivity.class);
+        intent.putExtra("bundle", b);
+        startActivity(intent);
     }
-
 
 
     @Override
     public void launchSettings() {
-        startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
+        startActivityForResult(new Intent(getApplicationContext(), SettingsActivity.class), OPEN_NEW_ACTIVITY);
     }
 
     @Override
     public void launchManageSubreddits() {
         startActivity(new Intent(getApplicationContext(), ManageSubredditsActivity.class));
+    }
+
+    @Override
+    public void clearDownloads() {
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which) {
+                    case DialogInterface.BUTTON_POSITIVE:
+                        deleteDownloads();
+                        break;
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        break;
+                }
+            }
+        };
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Delete downloaded pictures?").setPositiveButton("Yes", dialogClickListener)
+                .setNegativeButton("No", dialogClickListener).show();
+
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == OPEN_NEW_ACTIVITY) {
+            Toast.makeText(this, "You may need to refresh to apply settings", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mListAdapter.notifyDataSetChanged();
+    }
+
+    private void deleteDownloads() {
+        Fetch fetch = Fetch.newInstance(this);
+        fetch.removeAll();
+        fetch.release();
+        Toast.makeText(this, "Downloads deleted", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -179,6 +227,9 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
                 return true;
             case R.id.action_manage_subreddits:
                 launchManageSubreddits();
+                return true;
+            case R.id.action_clear_downloads:
+                clearDownloads();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

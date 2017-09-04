@@ -1,9 +1,7 @@
 package com.migafgarcia.redditimagedownloader.adapters;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.util.Log;
@@ -15,6 +13,8 @@ import com.migafgarcia.redditimagedownloader.R;
 import com.migafgarcia.redditimagedownloader.reddit_json.Post;
 import com.migafgarcia.redditimagedownloader.reddit_json.RedditResponse;
 import com.migafgarcia.redditimagedownloader.reddit_json.Resolution;
+import com.migafgarcia.redditimagedownloader.utils.Utils;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -46,9 +46,10 @@ public class ListAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(ListItemViewHolder holder, int position) {
+    public void onBindViewHolder(final ListItemViewHolder holder, int position) {
 
         final Post post = posts.get(position);
+
 
         if (position == 3 * getItemCount() / 4 && getItemCount() > 0)
             morePostsCallback.onMorePosts(after);
@@ -60,13 +61,13 @@ public class ListAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
 
         String url = post.getData().getThumbnail();
 
-        if(post.getData().getPreview().getEnabled()) {
+        if (post.getData().getPreview().getEnabled()) {
             List<Resolution> resolutions = post.getData().getPreview().getImages().get(0).getResolutions();
             int width = Resources.getSystem().getDisplayMetrics().widthPixels;
             Resolution current = resolutions.get(0);
 
-            for(Resolution res : resolutions)
-                if(res.getWidth() > current.getWidth() && res.getWidth() <width)
+            for (Resolution res : resolutions)
+                if (res.getWidth() > current.getWidth() && res.getWidth() < width)
                     current = res;
 
             Log.d(TAG, "Position: " + position + ", " + current.getWidth() + "x" + current.getHeight());
@@ -74,16 +75,26 @@ public class ListAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
             url = Html.fromHtml(current.getUrl()).toString();
         }
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        if (!prefs.getBoolean("nsfw_switch", false) && post.getData().getOver18())
-            Picasso.with(context).
-                    load(url).
-                    placeholder(R.color.cardview_dark_background);
-        else
-            Picasso.with(context).
-                    load(url).
-                    placeholder(R.color.cardview_dark_background).
-                    into(holder.preview);
+
+        final String finalUrl = url;
+        Picasso.with(context).
+                load(post.getData().getThumbnail()).
+                placeholder(R.color.cardview_dark_background).
+                resize(post.getData().getThumbnailWidth(), post.getData().getThumbnailHeight()).
+                into(holder.preview, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        Picasso.with(context).
+                                load(finalUrl).
+                                noPlaceholder().
+                                into(holder.preview);
+                    }
+
+                    @Override
+                    public void onError() {
+                    }
+                });
+
 
         holder.preview.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -100,6 +111,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
     }
 
     public void getPosts(RedditResponse response) {
+        Utils.processPosts(context, response);
         posts.clear();
         posts.addAll(response.getData().getPosts());
         after = response.getData().getAfter();
@@ -107,6 +119,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
     }
 
     public void morePosts(RedditResponse response) {
+        Utils.processPosts(context, response);
         posts.addAll(response.getData().getPosts());
         after = response.getData().getAfter();
         notifyDataSetChanged();

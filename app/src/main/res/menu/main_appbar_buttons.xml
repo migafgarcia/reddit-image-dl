@@ -12,10 +12,17 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/action_manage_subreddits"
-        android:icon="@drawable/ic_filter_list_black_24dp"
-        android:title="@string/action_manage_subreddits"
-        android:visible="true"
+    android:id="@+id/action_manage_subreddits"
+    android:icon="@drawable/ic_filter_list_black_24dp"
+    android:title="@string/action_manage_subreddits"
+    android:visible="false"
+    app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_clear_downloads"
+        android:icon="@drawable/ic_delete_black_24dp"
+        android:title="@string/action_clear_downloads"
+        android:visible="false"
         app:showAsAction="never" />
 
 </menu>

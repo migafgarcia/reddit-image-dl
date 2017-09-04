@@ -8,6 +8,8 @@ public final class SubredditEntry implements BaseColumns {
     public static final String COLUMN_NAME_NAME = "name";
     public static final String COLUMN_NAME_URL = "url";
     public static final String COLUMN_NAME_ACTIVATED = "activated";
-    private SubredditEntry() {}
+
+    private SubredditEntry() {
+    }
 
 }

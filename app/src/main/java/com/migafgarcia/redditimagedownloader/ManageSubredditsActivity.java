@@ -2,8 +2,8 @@ package com.migafgarcia.redditimagedownloader;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
@@ -45,7 +45,6 @@ public class ManageSubredditsActivity extends AppCompatActivity {
         };
 
 
-
         Cursor cursor = db.query(
                 SubredditEntry.TABLE_NAME,                     // The table to query
                 projection,                               // The columns to return
@@ -56,7 +55,7 @@ public class ManageSubredditsActivity extends AppCompatActivity {
                 null                                 // The sort order
         );
 
-        while(cursor.moveToNext()) {
+        while (cursor.moveToNext()) {
             long itemId = cursor.getLong(
                     cursor.getColumnIndexOrThrow(SubredditEntry._ID));
             String name = cursor.getString(

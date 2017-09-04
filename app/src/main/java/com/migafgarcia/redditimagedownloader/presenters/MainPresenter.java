@@ -4,12 +4,11 @@ import com.migafgarcia.redditimagedownloader.reddit_json.RedditResponse;
 import com.migafgarcia.redditimagedownloader.services.RedditApi;
 import com.migafgarcia.redditimagedownloader.utils.Utils;
 
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainPresenter implements Presenter<MainScreen> {
+public class MainPresenter {
 
     private MainScreen mainScreen;
     private RedditApi redditApi;
@@ -24,14 +23,12 @@ public class MainPresenter implements Presenter<MainScreen> {
         mainScreen.showLoading();
 
         // TODO: 21-08-2017 fetch subreddits from sqlite
-        redditApi.getService().getList("wallpaper").enqueue(new Callback<RedditResponse>() {
+        redditApi.getService().getList("earthporn+gonewild").enqueue(new Callback<RedditResponse>() {
             @Override
             public void onResponse(Call<RedditResponse> call, Response<RedditResponse> response) {
-                if(response.isSuccessful()) {
-                    Utils.processPosts(response.body());
+                if (response.isSuccessful()) {
                     mainScreen.getPosts(response.body());
-                }
-                else
+                } else
                     mainScreen.showGetRetry();
 
                 mainScreen.hideLoading();
@@ -47,14 +44,12 @@ public class MainPresenter implements Presenter<MainScreen> {
 
     public void morePosts(final String after) {
         mainScreen.showLoading();
-        redditApi.getService().getListAfter("wallpaper", after).enqueue(new Callback<RedditResponse>() {
+        redditApi.getService().getListAfter("earthporn+gonewild", after).enqueue(new Callback<RedditResponse>() {
             @Override
             public void onResponse(Call<RedditResponse> call, Response<RedditResponse> response) {
-                if(response.isSuccessful()) {
-                    Utils.processPosts(response.body());
+                if (response.isSuccessful()) {
                     mainScreen.morePosts(response.body());
-                }
-                else
+                } else
                     mainScreen.showMoreRetry(after);
 
                 mainScreen.hideLoading();
@@ -66,16 +61,5 @@ public class MainPresenter implements Presenter<MainScreen> {
                 mainScreen.hideLoading();
             }
         });
-    }
-
-    @Override
-    public void attachView(MainScreen mainScreen) {
-        this.mainScreen = mainScreen;
-
-    }
-
-    @Override
-    public void detachView() {
-        this.mainScreen = null;
     }
 }
