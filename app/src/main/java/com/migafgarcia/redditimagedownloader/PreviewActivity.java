@@ -63,7 +63,7 @@ public class PreviewActivity extends AppCompatActivity implements PreviewScreen,
     @BindView(R.id.preview_rl)
     RelativeLayout relativeLayout;
 
-    ProgressBar progressBar;
+    private ProgressBar progressBar;
 
     private Post mPost;
 
@@ -87,11 +87,12 @@ public class PreviewActivity extends AppCompatActivity implements PreviewScreen,
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_preview);
         ButterKnife.bind(this);
+        RedditImageDownloaderApp app = (RedditImageDownloaderApp) getApplication();
+
+        fetch = app.getFetch();
 
         helper = new DownloadsDbHelper(getApplicationContext());
         previewPresenter = new PreviewPresenter();
-        fetch = Fetch.newInstance(this);
-
         Bundle b = getIntent().getBundleExtra("bundle");
         mPost = b.getParcelable("Post");
 
@@ -110,6 +111,11 @@ public class PreviewActivity extends AppCompatActivity implements PreviewScreen,
         }
 
         mFloatingActionButton.bringToFront();
+
+        fetch.removeRequests();
+
+
+        System.out.println();
 
     }
 
@@ -138,12 +144,6 @@ public class PreviewActivity extends AppCompatActivity implements PreviewScreen,
         popupWindow.dismiss();
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        fetch.release();
-    }
-
     private void enqueueDownload() {
 
         String url = mPost.getData().getUrl();
@@ -155,6 +155,9 @@ public class PreviewActivity extends AppCompatActivity implements PreviewScreen,
         if (downloadId != Fetch.ENQUEUE_ERROR_ID) {
             popupWindow.showAtLocation(relativeLayout, Gravity.CENTER, 0, 0);
             progressBar.setIndeterminate(true);
+        }
+        else {
+            Toast.makeText(this, "Error queueing download", Toast.LENGTH_SHORT).show();
         }
 
         fetch.addFetchListener(this);
@@ -325,6 +328,7 @@ public class PreviewActivity extends AppCompatActivity implements PreviewScreen,
             switch (status) {
                 case Fetch.STATUS_DONE:
                     Log.d(TAG, "STATUS_DONE");
+                    downloadId = -1;
                     progressBar.setProgress(100);
                     popupWindow.dismiss();
                     downloadSuccessful();

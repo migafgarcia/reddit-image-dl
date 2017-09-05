@@ -10,7 +10,7 @@
     <string name="action_settings">Settings</string>
     <string name="action_manage_subreddits">Manage Subreddits</string>
     <string name="action_download">Download</string>
-    <string name="action_set_as">Set as...</string>
+    <string name="action_set_as">Set as…</string>
     <string name="action_thread">Go to Thread</string>
     <string name="action_subreddit">Go to subreddit</string>
     <string name="action_share">Share</string>

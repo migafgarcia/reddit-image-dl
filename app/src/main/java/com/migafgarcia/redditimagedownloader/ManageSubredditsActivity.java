@@ -15,20 +15,16 @@ import java.util.ArrayList;
 
 public class ManageSubredditsActivity extends AppCompatActivity {
 
-    private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manage_subreddits);
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.ms_recyclerview);
+        RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.ms_recyclerview);
 
         mRecyclerView.setHasFixedSize(true);
 
-        mLayoutManager = new GridLayoutManager(this, 2);
+        RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(this, 2);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         ArrayList<com.migafgarcia.redditimagedownloader.SubredditEntry> subreddits = new ArrayList<>();
@@ -60,9 +56,9 @@ public class ManageSubredditsActivity extends AppCompatActivity {
                     cursor.getColumnIndexOrThrow(SubredditEntry._ID));
             String name = cursor.getString(
                     cursor.getColumnIndexOrThrow(SubredditEntry.COLUMN_NAME_NAME));
-            String url = cursor.getString(
+            @SuppressWarnings("UnusedAssignment") String url = cursor.getString(
                     cursor.getColumnIndexOrThrow(SubredditEntry.COLUMN_NAME_URL));
-            int activated = cursor.getInt(
+            @SuppressWarnings("UnusedAssignment") int activated = cursor.getInt(
                     cursor.getColumnIndexOrThrow(SubredditEntry.COLUMN_NAME_ACTIVATED));
 
             subreddits.add(new com.migafgarcia.redditimagedownloader.SubredditEntry((int) itemId, name, "https://pbs.twimg.com/profile_images/737359467742912512/t_pzvyZZ_400x400.jpg"));
@@ -70,7 +66,7 @@ public class ManageSubredditsActivity extends AppCompatActivity {
         cursor.close();
 
 
-        mAdapter = new SubredditListAdapter(getApplicationContext(), subreddits);
+        RecyclerView.Adapter mAdapter = new SubredditListAdapter(getApplicationContext(), subreddits);
         mRecyclerView.setAdapter(mAdapter);
 
     }

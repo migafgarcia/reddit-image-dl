@@ -4,8 +4,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
-import android.os.PersistableBundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -37,7 +35,7 @@ import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity implements MainScreen {
 
-    public static final String TAG = MainActivity.class.getName();
+    private static final String TAG = MainActivity.class.getName();
 
     @BindView(R.id.main_recyclerview)
     RecyclerView mRecyclerView;
@@ -50,10 +48,9 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
 
     private MainPresenter mMainPresenter;
 
-    private RecyclerView.LayoutManager mLayoutManager;
     private ListAdapter mListAdapter;
 
-    public static final int OPEN_NEW_ACTIVITY = 151;
+    private static final int OPEN_NEW_ACTIVITY = 151;
 
 
     @Override
@@ -81,13 +78,15 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
 
         mMainPresenter.getPosts();
 
+        deleteDownloads();
+
     }
 
 
     private void initRecyclerView() {
         if (mRecyclerView == null)
             Log.e(TAG, "RecyclerView is null");
-        mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
@@ -208,9 +207,9 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
 
     private void deleteDownloads() {
         Fetch fetch = Fetch.newInstance(this);
-        fetch.removeAll();
+        fetch.removeRequests();
         fetch.release();
-        Toast.makeText(this, "Downloads deleted", Toast.LENGTH_SHORT).show();
+        // Toast.makeText(this, "Downloads deleted", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -264,7 +263,7 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
 
     private class RetryMoreListener implements View.OnClickListener {
 
-        private String after;
+        private final String after;
 
         RetryMoreListener(String after) {
             this.after = after;

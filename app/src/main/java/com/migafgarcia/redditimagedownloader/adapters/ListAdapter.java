@@ -14,7 +14,6 @@ import com.migafgarcia.redditimagedownloader.reddit_json.Post;
 import com.migafgarcia.redditimagedownloader.reddit_json.RedditResponse;
 import com.migafgarcia.redditimagedownloader.reddit_json.Resolution;
 import com.migafgarcia.redditimagedownloader.utils.Utils;
-import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -22,12 +21,12 @@ import java.util.List;
 
 public class ListAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
 
-    public static final String TAG = ListAdapter.class.getName();
+    private static final String TAG = ListAdapter.class.getName();
 
-    private Context context;
-    private ItemClickCallback itemClickCallback;
-    private MorePostsCallback morePostsCallback;
-    private List<Post> posts;
+    private final Context context;
+    private final ItemClickCallback itemClickCallback;
+    private final MorePostsCallback morePostsCallback;
+    private final List<Post> posts;
     private String after;
 
     public ListAdapter(Context context, ItemClickCallback itemClickCallback, MorePostsCallback morePostsCallback) {
@@ -51,20 +50,22 @@ public class ListAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
         final Post post = posts.get(position);
 
 
-        if (position == 3 * getItemCount() / 4 && getItemCount() > 0)
+        if (position == 3 * getItemCount() / 4 && getItemCount() > 0) {
             morePostsCallback.onMorePosts(after);
+        }
 
 
         holder.title.setText(post.getData().getTitle());
         holder.subreddit.setText(post.getData().getSubreddit());
         holder.user.setText(post.getData().getAuthor());
 
-        String url = post.getData().getThumbnail();
-
+        String url;
+        List<Resolution> resolutions = post.getData().getPreview().getImages().get(0).getResolutions();
+        Resolution current = resolutions.get(0);
         if (post.getData().getPreview().getEnabled()) {
-            List<Resolution> resolutions = post.getData().getPreview().getImages().get(0).getResolutions();
+
             int width = Resources.getSystem().getDisplayMetrics().widthPixels;
-            Resolution current = resolutions.get(0);
+
 
             for (Resolution res : resolutions)
                 if (res.getWidth() > current.getWidth() && res.getWidth() < width)
@@ -73,28 +74,19 @@ public class ListAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
             Log.d(TAG, "Position: " + position + ", " + current.getWidth() + "x" + current.getHeight());
             // TODO: 18-08-2017 find alternative non-deprecated function
             url = Html.fromHtml(current.getUrl()).toString();
+
+
+            Picasso.with(context).
+                    load(url).
+                    placeholder(R.color.cardview_dark_background).
+                    into(holder.preview);
         }
-
-
-        final String finalUrl = url;
-        Picasso.with(context).
-                load(post.getData().getThumbnail()).
-                placeholder(R.color.cardview_dark_background).
-                resize(post.getData().getThumbnailWidth(), post.getData().getThumbnailHeight()).
-                into(holder.preview, new Callback() {
-                    @Override
-                    public void onSuccess() {
-                        Picasso.with(context).
-                                load(finalUrl).
-                                noPlaceholder().
-                                into(holder.preview);
-                    }
-
-                    @Override
-                    public void onError() {
-                    }
-                });
-
+        else {
+            Picasso.with(context).
+                    load(post.getData().getThumbnail()).
+                    placeholder(R.color.cardview_dark_background).
+                    into(holder.preview);
+        }
 
         holder.preview.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -11,8 +11,10 @@ class ListItemViewHolder extends RecyclerView.ViewHolder {
 
     public static final String TAG = ListItemViewHolder.class.getName();
 
-    TextView title, subreddit, user;
-    ImageView preview;
+    final TextView title;
+    final TextView subreddit;
+    final TextView user;
+    final ImageView preview;
 
     ListItemViewHolder(View itemView) {
         super(itemView);

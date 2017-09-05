@@ -37,9 +37,9 @@ public class Image implements Parcelable {
     public Image() {
     }
 
-    protected Image(Parcel in) {
+    Image(Parcel in) {
         this.source = in.readParcelable(Resolution.class.getClassLoader());
-        this.resolutions = new ArrayList<Resolution>();
+        this.resolutions = new ArrayList<>();
         in.readList(this.resolutions, Resolution.class.getClassLoader());
         this.id = in.readString();
     }

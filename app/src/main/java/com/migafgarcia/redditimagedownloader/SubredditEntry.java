@@ -2,9 +2,9 @@ package com.migafgarcia.redditimagedownloader;
 
 
 public class SubredditEntry {
-    private int mId;
-    private String mSubreddit;
-    private String imageUrl;
+    private final int mId;
+    private final String mSubreddit;
+    private final String imageUrl;
 
     public SubredditEntry(int mId, String mSubreddit, String imageUrl) {
         this.mId = mId;

@@ -34,8 +34,8 @@ public class Preview implements Parcelable {
     public Preview() {
     }
 
-    protected Preview(Parcel in) {
-        this.images = new ArrayList<Image>();
+    Preview(Parcel in) {
+        this.images = new ArrayList<>();
         in.readList(this.images, Image.class.getClassLoader());
         this.enabled = (Boolean) in.readValue(Boolean.class.getClassLoader());
     }

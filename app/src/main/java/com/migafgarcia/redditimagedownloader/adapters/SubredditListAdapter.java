@@ -18,8 +18,8 @@ import java.util.List;
 
 public class SubredditListAdapter extends RecyclerView.Adapter<SubredditListAdapter.ViewHolder> {
 
-    private Context mContext;
-    private List<SubredditEntry> mSubreddits;
+    private final Context mContext;
+    private final List<SubredditEntry> mSubreddits;
 
     public SubredditListAdapter(Context mContext, List<SubredditEntry> mSubreddits) {
         this.mContext = mContext;
@@ -45,9 +45,9 @@ public class SubredditListAdapter extends RecyclerView.Adapter<SubredditListAdap
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        ImageView imageView;
-        TextView textView;
-        CheckBox checkbox;
+        final ImageView imageView;
+        final TextView textView;
+        final CheckBox checkbox;
 
         ViewHolder(View v) {
             super(v);

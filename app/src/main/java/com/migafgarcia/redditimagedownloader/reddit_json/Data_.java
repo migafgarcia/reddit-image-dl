@@ -75,7 +75,7 @@ public class Data_ implements Parcelable {
     public Data_() {
     }
 
-    protected Data_(Parcel in) {
+    Data_(Parcel in) {
         this.thumbnailWidth = (Integer) in.readValue(Integer.class.getClassLoader());
         this.subreddit = in.readString();
         this.id = in.readString();

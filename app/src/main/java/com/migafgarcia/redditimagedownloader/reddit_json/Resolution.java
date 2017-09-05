@@ -34,7 +34,7 @@ public class Resolution implements Parcelable {
     public Resolution() {
     }
 
-    protected Resolution(Parcel in) {
+    Resolution(Parcel in) {
         this.url = in.readString();
         this.width = (Integer) in.readValue(Integer.class.getClassLoader());
         this.height = (Integer) in.readValue(Integer.class.getClassLoader());

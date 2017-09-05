@@ -1,8 +1,9 @@
 package com.migafgarcia.redditimagedownloader.presenters;
 
+import android.support.annotation.NonNull;
+
 import com.migafgarcia.redditimagedownloader.reddit_json.RedditResponse;
 import com.migafgarcia.redditimagedownloader.services.RedditApi;
-import com.migafgarcia.redditimagedownloader.utils.Utils;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -10,8 +11,11 @@ import retrofit2.Response;
 
 public class MainPresenter {
 
-    private MainScreen mainScreen;
-    private RedditApi redditApi;
+    private final MainScreen mainScreen;
+    private final RedditApi redditApi;
+
+    private final String multireddit = "oldschoolcool+thewaywewere+pic+pics+AbandonedPorn+EarthPorn+MilitaryPorn+BotanicalPorn+waterporn+SeaPorn+SkyPorn+FirePorn+DesertPorn+WinterPorn+AutumnPorn+WeatherPorn+GeologyPorn+SpacePorn+BeachPorn+MushroomPorn+SpringPorn+SummerPorn+LavaPorn+LakePorn+CityPorn+VillagePorn+RuralPorn+ArchitecturePorn+HousePorn+CabinPorn+ChurchPorn+AbandonedPorn+CemeteryPorn+InfrastructurePorn+MachinePorn+CarPorn+F1Porn+MotorcyclePorn+MilitaryPorn+GunPorn+KnifePorn+BoatPorn+RidesPorn+DestructionPorn+ThingsCutInHalfPorn+StarshipPorn+ToolPorn+TechnologyPorn+BridgePorn+PolicePorn+SteamPorn+RetailPorn+SpaceFlightPorn+roadporn+drydockporn+AnimalPorn+HumanPorn+EarthlingPorn+AdrenalinePorn+ClimbingPorn+SportsPorn+AgriculturePorn+TeaPorn+BonsaiPorn+FoodPorn+CulinaryPorn+DessertPorn+DesignPorn+RoomPorn+AlbumArtPorn+MetalPorn+MoviePosterPorn+TelevisionPosterPorn+ComicBookPorn+StreetArtPorn+AdPorn+ArtPorn+FractalPorn+InstrumentPorn+ExposurePorn+MacroPorn+MicroPorn+GeekPorn+MTGPorn+GamerPorn+PowerWashingPorn+AerialPorn+OrganizationPorn+FashionPorn+AVPorn+ApocalypsePorn+InfraredPorn+ViewPorn+HellscapePorn+sculptureporn+HistoryPorn+UniformPorn+BookPorn+NewsPorn+QuotesPorn+FuturePorn+FossilPorn+MegalithPorn+ArtefactPorn+wallpaper+wallpapers+iWallpaper+Verticalwallpapers";
+
 
     public MainPresenter(MainScreen mainScreen, RedditApi redditApi) {
         this.mainScreen = mainScreen;
@@ -23,9 +27,9 @@ public class MainPresenter {
         mainScreen.showLoading();
 
         // TODO: 21-08-2017 fetch subreddits from sqlite
-        redditApi.getService().getList("earthporn+gonewild").enqueue(new Callback<RedditResponse>() {
+        redditApi.getService().getList(multireddit).enqueue(new Callback<RedditResponse>() {
             @Override
-            public void onResponse(Call<RedditResponse> call, Response<RedditResponse> response) {
+            public void onResponse(@NonNull Call<RedditResponse> call, @NonNull Response<RedditResponse> response) {
                 if (response.isSuccessful()) {
                     mainScreen.getPosts(response.body());
                 } else
@@ -35,7 +39,7 @@ public class MainPresenter {
             }
 
             @Override
-            public void onFailure(Call<RedditResponse> call, Throwable t) {
+            public void onFailure(@NonNull Call<RedditResponse> call, @NonNull Throwable t) {
                 mainScreen.showGetRetry();
                 mainScreen.hideLoading();
             }
@@ -44,9 +48,9 @@ public class MainPresenter {
 
     public void morePosts(final String after) {
         mainScreen.showLoading();
-        redditApi.getService().getListAfter("earthporn+gonewild", after).enqueue(new Callback<RedditResponse>() {
+        redditApi.getService().getListAfter(multireddit, after).enqueue(new Callback<RedditResponse>() {
             @Override
-            public void onResponse(Call<RedditResponse> call, Response<RedditResponse> response) {
+            public void onResponse(@NonNull Call<RedditResponse> call, @NonNull Response<RedditResponse> response) {
                 if (response.isSuccessful()) {
                     mainScreen.morePosts(response.body());
                 } else
@@ -56,7 +60,7 @@ public class MainPresenter {
             }
 
             @Override
-            public void onFailure(Call<RedditResponse> call, Throwable t) {
+            public void onFailure(@NonNull Call<RedditResponse> call, @NonNull Throwable t) {
                 mainScreen.showMoreRetry(after);
                 mainScreen.hideLoading();
             }

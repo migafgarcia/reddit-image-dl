@@ -17,7 +17,7 @@ public class SubredditsDbHelper extends SQLiteOpenHelper {
             "DROP TABLE IF EXISTS " + SubredditEntry.TABLE_NAME;
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "Subreddits.db";
-    private String[] defaultSubreddits = {"EarthPorn", "ExposurePorn", "ImaginaryLandscapes", "ImaginaryTechnology", "LightGraffiti", "SkyPorn", "futureporn", "lightpainting", "wallpaper", "wallpapers", "cyberpunk", "PsychedelicWallpapers", "ultrahdwallpapers"};
+    private final String[] defaultSubreddits = {"EarthPorn", "ExposurePorn", "ImaginaryLandscapes", "ImaginaryTechnology", "LightGraffiti", "SkyPorn", "futureporn", "lightpainting", "wallpaper", "wallpapers", "cyberpunk", "PsychedelicWallpapers", "ultrahdwallpapers"};
 
     public SubredditsDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);

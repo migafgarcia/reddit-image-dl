@@ -27,10 +27,10 @@ public class Post implements Parcelable {
     @Expose
     private Data_ data;
 
-    public Post() {
+    private Post() {
     }
 
-    protected Post(Parcel in) {
+    private Post(Parcel in) {
         this.kind = in.readString();
         this.data = in.readParcelable(Data_.class.getClassLoader());
     }
