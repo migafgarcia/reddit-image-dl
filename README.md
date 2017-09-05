@@ -4,7 +4,7 @@ A wallpaper app based on reddit.
 
 ## Current state
 
-<img src="/screenshots/mobizen_20170902_015030.gif" width="350">
+<img src="/screenshots/SVID_20170905_201451.gif" width="350">
 
 ## TODO list
 
