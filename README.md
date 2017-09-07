@@ -11,6 +11,7 @@ This repository contains the source code for the Image Downloader for Reddit app
  - Provide Hot, New and Top listings in MainActivity
  - Options menu with the abitily to
     - Add or remove subreddits
+ - Replace Fetch with my own DownloadManager wrapper
   
  - ~~Pinch to zoom in PreviewActivity~~
  - ~~Allow the user to download, share, set directly to wallpaper, go to the original thread and go to the original subreddit in PreviewActivity~~
