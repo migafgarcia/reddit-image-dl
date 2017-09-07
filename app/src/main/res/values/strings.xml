@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Reddit Image Downloader</string>
+    <string name="app_name">Image Downloader for Reddit</string>
 
     <string name="title_activity_settings">Settings</string>
 
