@@ -1,11 +1,5 @@
 # Reddit Image Downloader
 
-A wallpaper app based on reddit.
-
-## Current state
-
-<img src="/screenshots/SVID_20170905_201451.gif" width="350">
-
 ## TODO list
 
  - Handle configuration changes
