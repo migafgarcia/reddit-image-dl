@@ -1,4 +1,4 @@
-package com.migafgarcia.redditimagedownloader.reddit_json;
+package com.migafgarcia.redditimagedownloader.model;
 
 
 import android.os.Parcel;
@@ -10,7 +10,7 @@ import com.google.gson.annotations.SerializedName;
 public class Resolution implements Parcelable {
 
     public static final String TAG = Resolution.class.getName();
-    public static final Parcelable.Creator<Resolution> CREATOR = new Parcelable.Creator<Resolution>() {
+    public static final Creator<Resolution> CREATOR = new Creator<Resolution>() {
         @Override
         public Resolution createFromParcel(Parcel source) {
             return new Resolution(source);

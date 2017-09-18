@@ -21,10 +21,10 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.migafgarcia.redditimagedownloader.adapters.ListAdapter;
+import com.migafgarcia.redditimagedownloader.model.Link;
+import com.migafgarcia.redditimagedownloader.model.Thing;
 import com.migafgarcia.redditimagedownloader.presenters.MainPresenter;
 import com.migafgarcia.redditimagedownloader.presenters.MainScreen;
-import com.migafgarcia.redditimagedownloader.reddit_json.Post;
-import com.migafgarcia.redditimagedownloader.reddit_json.RedditResponse;
 import com.migafgarcia.redditimagedownloader.services.RedditApi;
 import com.tonyodev.fetch.Fetch;
 
@@ -37,13 +37,13 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
 
     private static final String TAG = MainActivity.class.getName();
 
-    @BindView(R.id.main_recyclerview)
+    @BindView(R.id.rv_main)
     RecyclerView mRecyclerView;
-    @BindView(R.id.main_srl)
+    @BindView(R.id.srl_main)
     SwipeRefreshLayout mSwipeRefreshLayout;
-    @BindView(R.id.main_fab)
+    @BindView(R.id.fab_main)
     FloatingActionButton mFloatingActionButton;
-    @BindView(R.id.main_toolbar)
+    @BindView(R.id.tb_main)
     Toolbar mToolbar;
 
     private MainPresenter mMainPresenter;
@@ -51,7 +51,6 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
     private ListAdapter mListAdapter;
 
     private static final int OPEN_NEW_ACTIVITY = 151;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,7 +81,6 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
 
     }
 
-
     private void initRecyclerView() {
         if (mRecyclerView == null)
             Log.e(TAG, "RecyclerView is null");
@@ -92,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
 
         ListAdapter.ItemClickCallback itemClickCallback = new ListAdapter.ItemClickCallback() {
             @Override
-            public void onItemClick(Post post) {
+            public void onItemClick(Link post) {
                 launchPreview(post);
             }
         };
@@ -109,13 +107,13 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
     }
 
     @Override
-    public void getPosts(RedditResponse response) {
-        mListAdapter.getPosts(response);
+    public void getPosts(Thing response) {
+        mListAdapter.updatePosts(response);
     }
 
     @Override
-    public void morePosts(RedditResponse response) {
-        mListAdapter.morePosts(response);
+    public void morePosts(Thing response) {
+        mListAdapter.updatePosts(response);
     }
 
     @Override
@@ -135,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
 
     @Override
     public void showGetRetry() {
-        Snackbar mySnackbar = Snackbar.make(findViewById(R.id.main_coordinator_layout),
+        Snackbar mySnackbar = Snackbar.make(findViewById(R.id.cl_main),
                 "Error getting posts", Snackbar.LENGTH_INDEFINITE);
         mySnackbar.setAction("Retry", new RetryGetListener());
         mySnackbar.show();
@@ -143,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
 
     @Override
     public void showMoreRetry(String after) {
-        Snackbar mySnackbar = Snackbar.make(findViewById(R.id.main_coordinator_layout),
+        Snackbar mySnackbar = Snackbar.make(findViewById(R.id.cl_main),
                 "Error getting posts", Snackbar.LENGTH_INDEFINITE);
         mySnackbar.setAction("Retry", new RetryMoreListener(after));
         mySnackbar.show();
@@ -151,7 +149,7 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
     }
 
     @Override
-    public void launchPreview(Post post) {
+    public void launchPreview(Link post) {
         Bundle b = new Bundle();
         b.putParcelable("Post", post);
         Intent intent = new Intent(MainActivity.this, PreviewActivity.class);
@@ -167,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
 
     @Override
     public void launchManageSubreddits() {
-        startActivity(new Intent(getApplicationContext(), ManageSubredditsActivity.class));
+        //startActivity(new Intent(getApplicationContext(), ManageSubredditsActivity.class));
     }
 
     @Override
@@ -217,7 +215,6 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
         mRecyclerView.smoothScrollToPosition(0);
     }
 
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -248,7 +245,7 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
         return getApplicationContext();
     }
 
-    @OnClick(R.id.main_fab)
+    @OnClick(R.id.fab_main)
     public void onFloatingActionButtonClicked() {
         scrollToStart();
     }

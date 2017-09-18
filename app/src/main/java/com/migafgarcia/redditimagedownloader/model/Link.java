@@ -1,4 +1,5 @@
-package com.migafgarcia.redditimagedownloader.reddit_json;
+package com.migafgarcia.redditimagedownloader.model;
+
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -6,20 +7,8 @@ import android.os.Parcelable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Data_ implements Parcelable {
+public class Link extends Data implements Parcelable {
 
-    public static final String TAG = Data_.class.getName();
-    public static final Parcelable.Creator<Data_> CREATOR = new Parcelable.Creator<Data_>() {
-        @Override
-        public Data_ createFromParcel(Parcel source) {
-            return new Data_(source);
-        }
-
-        @Override
-        public Data_[] newArray(int size) {
-            return new Data_[size];
-        }
-    };
     @SerializedName("thumbnail_width")
     @Expose
     private Integer thumbnailWidth;
@@ -71,29 +60,6 @@ public class Data_ implements Parcelable {
     @SerializedName("preview")
     @Expose
     private Preview preview;
-
-    public Data_() {
-    }
-
-    Data_(Parcel in) {
-        this.thumbnailWidth = (Integer) in.readValue(Integer.class.getClassLoader());
-        this.subreddit = in.readString();
-        this.id = in.readString();
-        this.title = in.readString();
-        this.score = in.readString();
-        this.over18 = (Boolean) in.readValue(Boolean.class.getClassLoader());
-        this.thumbnail = in.readString();
-        this.subredditId = in.readString();
-        this.postHint = in.readString();
-        this.thumbnailHeight = (Integer) in.readValue(Integer.class.getClassLoader());
-        this.permalink = in.readString();
-        this.locked = (Boolean) in.readValue(Boolean.class.getClassLoader());
-        this.created = (Float) in.readValue(Float.class.getClassLoader());
-        this.url = in.readString();
-        this.author = in.readString();
-        this.createdUtc = (Float) in.readValue(Float.class.getClassLoader());
-        this.preview = in.readParcelable(Preview.class.getClassLoader());
-    }
 
     public Integer getThumbnailWidth() {
         return thumbnailWidth;
@@ -188,4 +154,39 @@ public class Data_ implements Parcelable {
         dest.writeValue(this.createdUtc);
         dest.writeParcelable(this.preview, flags);
     }
+
+    public Link() {
+    }
+
+    protected Link(Parcel in) {
+        this.thumbnailWidth = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.subreddit = in.readString();
+        this.id = in.readString();
+        this.title = in.readString();
+        this.score = in.readString();
+        this.over18 = (Boolean) in.readValue(Boolean.class.getClassLoader());
+        this.thumbnail = in.readString();
+        this.subredditId = in.readString();
+        this.postHint = in.readString();
+        this.thumbnailHeight = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.permalink = in.readString();
+        this.locked = (Boolean) in.readValue(Boolean.class.getClassLoader());
+        this.created = (Float) in.readValue(Float.class.getClassLoader());
+        this.url = in.readString();
+        this.author = in.readString();
+        this.createdUtc = (Float) in.readValue(Float.class.getClassLoader());
+        this.preview = in.readParcelable(Preview.class.getClassLoader());
+    }
+
+    public static final Parcelable.Creator<Link> CREATOR = new Parcelable.Creator<Link>() {
+        @Override
+        public Link createFromParcel(Parcel source) {
+            return new Link(source);
+        }
+
+        @Override
+        public Link[] newArray(int size) {
+            return new Link[size];
+        }
+    };
 }

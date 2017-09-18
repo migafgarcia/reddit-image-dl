@@ -32,10 +32,10 @@ import android.widget.Toast;
 
 import com.jsibbold.zoomage.ZoomageView;
 import com.migafgarcia.redditimagedownloader.db.DownloadsDbHelper;
+import com.migafgarcia.redditimagedownloader.model.Link;
+import com.migafgarcia.redditimagedownloader.model.Resolution;
 import com.migafgarcia.redditimagedownloader.presenters.PreviewPresenter;
 import com.migafgarcia.redditimagedownloader.presenters.PreviewScreen;
-import com.migafgarcia.redditimagedownloader.reddit_json.Post;
-import com.migafgarcia.redditimagedownloader.reddit_json.Resolution;
 import com.squareup.picasso.Picasso;
 import com.tonyodev.fetch.Fetch;
 import com.tonyodev.fetch.listener.FetchListener;
@@ -65,7 +65,7 @@ public class PreviewActivity extends AppCompatActivity implements PreviewScreen,
 
     private ProgressBar progressBar;
 
-    private Post mPost;
+    private Link mPost;
 
     private PreviewPresenter previewPresenter;
 
@@ -96,7 +96,7 @@ public class PreviewActivity extends AppCompatActivity implements PreviewScreen,
         Bundle b = getIntent().getBundleExtra("bundle");
         mPost = b.getParcelable("Post");
 
-        filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/RedditImageDownloader/" + Uri.parse(mPost.getData().getUrl()).getLastPathSegment();
+        filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/RedditImageDownloader/" + Uri.parse(mPost.getUrl()).getLastPathSegment();
 
         loadPreview();
 
@@ -146,7 +146,7 @@ public class PreviewActivity extends AppCompatActivity implements PreviewScreen,
 
     private void enqueueDownload() {
 
-        String url = mPost.getData().getUrl();
+        String url = mPost.getUrl();
 
         Request request = new Request(url, filePath);
 
@@ -165,7 +165,7 @@ public class PreviewActivity extends AppCompatActivity implements PreviewScreen,
     }
 
     private void loadPreview() {
-        List<Resolution> resolutions = mPost.getData().getPreview().getImages().get(0).getResolutions();
+        List<Resolution> resolutions = mPost.getPreview().getImages().get(0).getResolutions();
         int currentWidth = 0;
         Resolution current = resolutions.get(0);
 
@@ -256,13 +256,13 @@ public class PreviewActivity extends AppCompatActivity implements PreviewScreen,
 
     @Override
     public void goToThread() {
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.reddit.com" + mPost.getData().getPermalink()));
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.reddit.com" + mPost.getPermalink()));
         startActivity(intent);
     }
 
     @Override
     public void goToSubreddit() {
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.reddit.com/r/" + mPost.getData().getSubreddit()));
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.reddit.com/r/" + mPost.getSubreddit()));
         startActivity(intent);
     }
 
@@ -290,7 +290,7 @@ public class PreviewActivity extends AppCompatActivity implements PreviewScreen,
         Intent i = new Intent(Intent.ACTION_SEND);
         i.setType("text/plain");
         i.putExtra(Intent.EXTRA_SUBJECT, "Sharing URL");
-        i.putExtra(Intent.EXTRA_TEXT, mPost.getData().getUrl());
+        i.putExtra(Intent.EXTRA_TEXT, mPost.getUrl());
         startActivity(Intent.createChooser(i, "Share URL"));
     }
 
