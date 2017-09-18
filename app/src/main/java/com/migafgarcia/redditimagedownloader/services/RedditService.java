@@ -9,14 +9,16 @@ import retrofit2.http.Query;
 
 public interface RedditService {
 
-    @GET("r/{subs}/hot.json")
+    @GET("r/{subs}/hot.json?raw_json=1")
     Call<Thing> getList(@Path("subs") String subs);
 
-    @GET("r/{sub}/about.json")
+    @GET("r/{sub}/about.json?raw_json=1")
     Call<Thing> getSubredditInfo(@Path("sub") String subreddit);
 
-    @GET("r/{subs}/hot.json")
+    @GET("r/{subs}/hot.json?raw_json=1")
     Call<Thing> getListAfter(@Path("subs") String subs, @Query("after") String after);
+
+
 
 
 }

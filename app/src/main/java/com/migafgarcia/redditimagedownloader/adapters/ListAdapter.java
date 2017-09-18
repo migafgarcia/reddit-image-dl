@@ -3,7 +3,6 @@ package com.migafgarcia.redditimagedownloader.adapters;
 import android.content.Context;
 import android.content.res.Resources;
 import android.support.v7.widget.RecyclerView;
-import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -53,12 +52,10 @@ public class ListAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
             morePostsCallback.onMorePosts(posts.getAfter());
         }
 
-
         holder.title.setText(post.getTitle());
         holder.subreddit.setText(post.getSubreddit());
         holder.user.setText(post.getAuthor());
 
-        String url;
         List<Resolution> resolutions = post.getPreview().getImages().get(0).getResolutions();
         Resolution current = resolutions.get(0);
         if (post.getPreview().getEnabled()) {
@@ -71,12 +68,9 @@ public class ListAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
                     current = res;
 
             Log.d(TAG, "Position: " + position + ", " + current.getWidth() + "x" + current.getHeight());
-            // TODO: 18-08-2017 find alternative non-deprecated function
-            url = Html.fromHtml(current.getUrl()).toString();
-
 
             Picasso.with(context).
-                    load(url).
+                    load(current.getUrl()).
                     placeholder(R.color.cardview_dark_background).
                     into(holder.preview);
         }

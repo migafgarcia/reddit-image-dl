@@ -173,12 +173,8 @@ public class PreviewActivity extends AppCompatActivity implements PreviewScreen,
             if (res.getWidth() > currentWidth)
                 current = res;
 
-        // TODO: 18-08-2017 find alternative non-deprecated function
-        String url = Html.fromHtml(current.getUrl()).toString();
-
-
         // TODO: 23-08-2017 load the same preview that was loaded in MainActivity due to animation
-        Picasso.with(getApplicationContext()).load(url).into(mZoomageView);
+        Picasso.with(getApplicationContext()).load(current.getUrl()).into(mZoomageView);
     }
 
     @Override
