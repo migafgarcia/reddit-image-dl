@@ -165,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
 
     @Override
     public void launchManageSubreddits() {
-        //startActivity(new Intent(getApplicationContext(), ManageSubredditsActivity.class));
+        startActivity(new Intent(getApplicationContext(), SearchActivity.class));
     }
 
     @Override

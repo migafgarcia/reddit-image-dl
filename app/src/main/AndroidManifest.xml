@@ -27,6 +27,8 @@
 
         <activity android:name=".PreviewActivity" />
 
+        <activity android:name=".SearchActivity" />
+
         <activity
             android:name=".SettingsActivity"
             android:screenOrientation="portrait"

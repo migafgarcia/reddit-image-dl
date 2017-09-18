@@ -15,7 +15,7 @@
     android:id="@+id/action_manage_subreddits"
     android:icon="@drawable/ic_filter_list_black_24dp"
     android:title="@string/action_manage_subreddits"
-    android:visible="false"
+    android:visible="true"
     app:showAsAction="never" />
 
     <item
