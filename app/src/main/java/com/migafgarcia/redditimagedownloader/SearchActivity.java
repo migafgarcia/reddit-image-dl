@@ -1,5 +1,6 @@
 package com.migafgarcia.redditimagedownloader;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -7,6 +8,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 
@@ -31,19 +35,73 @@ public class SearchActivity extends AppCompatActivity {
     @BindView(R.id.srl_search)
     SwipeRefreshLayout swipeRefreshLayout;
 
-    final int TYPING_TIMEOUT = 5000; // 5 seconds timeout
-    boolean isTyping;
+    ArrayAdapter<Subreddit> adapter;
+
+    final int TYPING_TIMEOUT = 1000; // 5 seconds timeout
     final Handler timeoutHandler = new Handler();
     final Runnable typingTimeout = new Runnable() {
         public void run() {
-            isTyping = false;
             search();
         }
     };
 
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_search);
+        ButterKnife.bind(this);
+
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
+
+        resultsListView.setAdapter(adapter);
+
+        searchEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                timeoutHandler.removeCallbacks(typingTimeout);
+                timeoutHandler.postDelayed(typingTimeout, TYPING_TIMEOUT);
+
+            }
+        });
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                search();
+            }
+        });
+
+        resultsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                // TODO: 19-09-2017  
+                Intent intent = new Intent();
+                intent.putExtra("editTextValue", "value_here");
+                setResult(RESULT_OK, intent);
+                finish();
+            }
+        });
+    }
+
     private void search() {
 
         RedditApi redditApi = new RedditApi();
+
+        if(searchEditText.getText().toString().length() == 0) {
+            swipeRefreshLayout.setRefreshing(false);
+            return;
+        }
 
         swipeRefreshLayout.setRefreshing(true);
 
@@ -55,58 +113,24 @@ public class SearchActivity extends AppCompatActivity {
 
                 Listing listing = (Listing) response.body().getData();
 
+                adapter.clear();
                 for (Thing t : listing.getChildren()) {
                     Subreddit s = (Subreddit) t.getData();
-                    Log.d(TAG, s.getDisplayName());
+                    adapter.add(s);
                 }
+
+                adapter.notifyDataSetChanged();
             }
 
             @Override
             public void onFailure(Call<Thing> call, Throwable t) {
-
-            }
-        });
-
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_search);
-        ButterKnife.bind(this);
-
-        searchEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                // reset the timeout
-                timeoutHandler.removeCallbacks(typingTimeout);
-
-                if (searchEditText.getText().toString().trim().length() > 0) {
-                    // schedule the timeout
-                    timeoutHandler.postDelayed(typingTimeout, TYPING_TIMEOUT);
-
-                    if (!isTyping) {
-                        isTyping = true;
-                        search();
-                    }
-                }
-                else {
-                    isTyping = false;
-                    search();
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
+                swipeRefreshLayout.setRefreshing(false);
+                // TODO: 19-09-2017 feedback on failure
             }
         });
 
 
+
     }
+
 }

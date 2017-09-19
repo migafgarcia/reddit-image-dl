@@ -680,4 +680,8 @@ public class Subreddit extends Data {
         this.userIsSubscriber = userIsSubscriber;
     }
 
+    @Override
+    public String toString() {
+        return getDisplayNamePrefixed();
+    }
 }

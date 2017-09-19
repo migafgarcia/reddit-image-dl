@@ -18,7 +18,7 @@ public interface RedditService {
     @GET("r/{subs}/hot.json?raw_json=1")
     Call<Thing> getListAfter(@Path("subs") String subs, @Query("after") String after);
 
-    @GET("subreddits/search.json?raw_json=1")
+    @GET("subreddits/search.json?raw_json=1&sort=relevance")
     Call<Thing> searchSubreddit(@Query("q") String query);
 
 
