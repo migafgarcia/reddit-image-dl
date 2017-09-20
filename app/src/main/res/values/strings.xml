@@ -15,4 +15,5 @@
     <string name="action_subreddit">Go to subreddit</string>
     <string name="action_share">Share</string>
     <string name="action_clear_downloads">Clear downloads</string>
+    <string name="title_activity_subreddit">SubredditActivity</string>
 </resources>

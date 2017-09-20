@@ -1,8 +1,5 @@
 package com.migafgarcia.redditimagedownloader.model;
 
-
-import android.util.Log;
-
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -15,18 +12,17 @@ import java.lang.reflect.Type;
 public class ThingDeserializer implements JsonDeserializer<Thing> {
 
 
+    private static final String TAG = ThingDeserializer.class.getName();
+
     @Override
     public Thing deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         JsonObject jsonObject = json.getAsJsonObject();
 
         String kind = jsonObject.get("kind").getAsString();
 
-        Log.d("DESERIALIZER", kind);
-
         switch(kind) {
             case "Listing":
-                Thing thing = new Thing(null, null, kind, (Listing) context.deserialize(jsonObject.get("data"), Listing.class));
-                return thing;
+                return new Thing(null, null, kind, (Listing) context.deserialize(jsonObject.get("data"), Listing.class));
             case "t3":
                 return new Thing(null, null, kind, (Link) context.deserialize(jsonObject.get("data"), Link.class));
             case "t5":

@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -50,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
 
     private ListAdapter mListAdapter;
 
-    private static final int OPEN_NEW_ACTIVITY = 151;
+    private static final int OPEN_SETTINGS_ACTIVITY = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +62,13 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
         mMainPresenter = new MainPresenter(this, new RedditApi());
 
         setSupportActionBar(mToolbar);
+
+        ActionBar ab = getSupportActionBar();
+
+        if(ab!= null) {
+            ab.setIcon(R.mipmap.ic_launcher);
+            ab.setDisplayShowTitleEnabled(false);
+        }
 
         initRecyclerView();
 
@@ -108,7 +116,9 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
 
     @Override
     public void getPosts(Thing response) {
+        mListAdapter.clear();
         mListAdapter.updatePosts(response);
+        Log.d(TAG, "Get Posts");
     }
 
     @Override
@@ -160,12 +170,12 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
 
     @Override
     public void launchSettings() {
-        startActivityForResult(new Intent(getApplicationContext(), SettingsActivity.class), OPEN_NEW_ACTIVITY);
+        startActivityForResult(new Intent(getApplicationContext(), SettingsActivity.class), OPEN_SETTINGS_ACTIVITY);
     }
 
     @Override
     public void launchManageSubreddits() {
-        startActivity(new Intent(getApplicationContext(), SearchActivity.class));
+        startActivity(new Intent(getApplicationContext(), SubredditActivity.class));
     }
 
     @Override
@@ -192,8 +202,8 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == OPEN_NEW_ACTIVITY) {
-            Toast.makeText(this, "You may need to refresh to apply settings", Toast.LENGTH_LONG).show();
+        if (requestCode == OPEN_SETTINGS_ACTIVITY) {
+            mListAdapter.reprocessPosts();
         }
     }
 

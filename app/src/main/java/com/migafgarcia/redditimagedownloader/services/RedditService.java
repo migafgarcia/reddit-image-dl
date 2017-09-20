@@ -21,7 +21,4 @@ public interface RedditService {
     @GET("subreddits/search.json?raw_json=1&sort=relevance")
     Call<Thing> searchSubreddit(@Query("q") String query);
 
-
-
-
 }

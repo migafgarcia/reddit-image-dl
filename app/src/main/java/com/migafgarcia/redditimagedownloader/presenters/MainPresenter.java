@@ -53,16 +53,16 @@ public class MainPresenter {
             @Override
             public void onResponse(Call<Thing> call, Response<Thing> response) {
                 if (response.isSuccessful()) {
-                    mainScreen.getPosts(response.body());
+                    mainScreen.morePosts(response.body());
                 } else
-                    mainScreen.showGetRetry(); // TODO: 18-09-2017 after must be passed here
+                    mainScreen.showMoreRetry(after);
 
                 mainScreen.hideLoading();
             }
 
             @Override
             public void onFailure(Call<Thing> call, Throwable t) {
-                mainScreen.showGetRetry();
+                mainScreen.showMoreRetry(after);
                 mainScreen.hideLoading();
 
             }

@@ -16,7 +16,6 @@ import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Html;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -31,7 +30,6 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.jsibbold.zoomage.ZoomageView;
-import com.migafgarcia.redditimagedownloader.db.DownloadsDbHelper;
 import com.migafgarcia.redditimagedownloader.model.Link;
 import com.migafgarcia.redditimagedownloader.model.Resolution;
 import com.migafgarcia.redditimagedownloader.presenters.PreviewPresenter;
@@ -69,8 +67,6 @@ public class PreviewActivity extends AppCompatActivity implements PreviewScreen,
 
     private PreviewPresenter previewPresenter;
 
-    private DownloadsDbHelper helper;
-
     private Fetch fetch;
 
     private PopupWindow popupWindow;
@@ -91,7 +87,6 @@ public class PreviewActivity extends AppCompatActivity implements PreviewScreen,
 
         fetch = app.getFetch();
 
-        helper = new DownloadsDbHelper(getApplicationContext());
         previewPresenter = new PreviewPresenter();
         Bundle b = getIntent().getBundleExtra("bundle");
         mPost = b.getParcelable("Post");

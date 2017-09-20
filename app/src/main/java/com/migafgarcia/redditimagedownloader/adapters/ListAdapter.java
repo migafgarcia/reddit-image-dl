@@ -17,6 +17,7 @@ import com.migafgarcia.redditimagedownloader.utils.PostsUtils;
 import com.squareup.picasso.Picasso;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ListAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
@@ -95,6 +96,13 @@ public class ListAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
         return posts.getChildren().size();
     }
 
+    public void clear() {
+        this.posts.setBefore("");
+        this.posts.setAfter("");
+        this.posts.setModhash("");
+        this.posts.setChildren(new ArrayList<Thing>());
+    }
+
     public void updatePosts(Thing response) {
         Listing listing = (Listing) response.getData();
         PostsUtils.processPosts(context, listing);
@@ -104,6 +112,11 @@ public class ListAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
         this.posts.getChildren().addAll(listing.getChildren());
         this.posts.setModhash(listing.getModhash());
 
+        notifyDataSetChanged();
+    }
+
+    public void reprocessPosts() {
+        PostsUtils.processPosts(context, posts);
         notifyDataSetChanged();
     }
 
