@@ -1,4 +1,4 @@
-package com.migafgarcia.redditimagedownloader.reddit_json;
+package com.migafgarcia.redditimagedownloader.model;
 
 
 import android.os.Parcel;
@@ -13,7 +13,7 @@ import java.util.List;
 public class Image implements Parcelable {
 
     public static final String TAG = Image.class.getName();
-    public static final Parcelable.Creator<Image> CREATOR = new Parcelable.Creator<Image>() {
+    public static final Creator<Image> CREATOR = new Creator<Image>() {
         @Override
         public Image createFromParcel(Parcel source) {
             return new Image(source);

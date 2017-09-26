@@ -1,8 +1,6 @@
 package com.migafgarcia.redditimagedownloader.presenters;
 
-import android.support.annotation.NonNull;
-
-import com.migafgarcia.redditimagedownloader.reddit_json.RedditResponse;
+import com.migafgarcia.redditimagedownloader.model.Thing;
 import com.migafgarcia.redditimagedownloader.services.RedditApi;
 
 import retrofit2.Call;
@@ -11,6 +9,7 @@ import retrofit2.Response;
 
 public class MainPresenter {
 
+    private static final String TAG = MainPresenter.class.getName();
     private final MainScreen mainScreen;
     private final RedditApi redditApi;
 
@@ -27,9 +26,9 @@ public class MainPresenter {
         mainScreen.showLoading();
 
         // TODO: 21-08-2017 fetch subreddits from sqlite
-        redditApi.getService().getList(multireddit).enqueue(new Callback<RedditResponse>() {
+        redditApi.getService().getList(multireddit).enqueue(new Callback<Thing>() {
             @Override
-            public void onResponse(@NonNull Call<RedditResponse> call, @NonNull Response<RedditResponse> response) {
+            public void onResponse(Call<Thing> call, Response<Thing> response) {
                 if (response.isSuccessful()) {
                     mainScreen.getPosts(response.body());
                 } else
@@ -39,18 +38,20 @@ public class MainPresenter {
             }
 
             @Override
-            public void onFailure(@NonNull Call<RedditResponse> call, @NonNull Throwable t) {
+            public void onFailure(Call<Thing> call, Throwable t) {
                 mainScreen.showGetRetry();
                 mainScreen.hideLoading();
+
             }
         });
     }
 
+
     public void morePosts(final String after) {
         mainScreen.showLoading();
-        redditApi.getService().getListAfter(multireddit, after).enqueue(new Callback<RedditResponse>() {
+        redditApi.getService().getListAfter(multireddit, after).enqueue(new Callback<Thing>() {
             @Override
-            public void onResponse(@NonNull Call<RedditResponse> call, @NonNull Response<RedditResponse> response) {
+            public void onResponse(Call<Thing> call, Response<Thing> response) {
                 if (response.isSuccessful()) {
                     mainScreen.morePosts(response.body());
                 } else
@@ -60,9 +61,10 @@ public class MainPresenter {
             }
 
             @Override
-            public void onFailure(@NonNull Call<RedditResponse> call, @NonNull Throwable t) {
+            public void onFailure(Call<Thing> call, Throwable t) {
                 mainScreen.showMoreRetry(after);
                 mainScreen.hideLoading();
+
             }
         });
     }

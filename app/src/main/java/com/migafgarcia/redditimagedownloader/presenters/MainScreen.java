@@ -1,14 +1,14 @@
 package com.migafgarcia.redditimagedownloader.presenters;
 
 
-import com.migafgarcia.redditimagedownloader.reddit_json.Post;
-import com.migafgarcia.redditimagedownloader.reddit_json.RedditResponse;
+import com.migafgarcia.redditimagedownloader.model.Link;
+import com.migafgarcia.redditimagedownloader.model.Thing;
 
 public interface MainScreen extends Screen {
 
-    void getPosts(RedditResponse response);
+    void getPosts(Thing response);
 
-    void morePosts(RedditResponse response);
+    void morePosts(Thing response);
 
     void showToast(String error); // TODO: 23-08-2017 change to use a string ID instead
 
@@ -22,7 +22,7 @@ public interface MainScreen extends Screen {
 
     void scrollToStart();
 
-    void launchPreview(Post post);
+    void launchPreview(Link post);
 
     void launchSettings();
 

@@ -16,7 +16,6 @@ import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Html;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -31,11 +30,10 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.jsibbold.zoomage.ZoomageView;
-import com.migafgarcia.redditimagedownloader.db.DownloadsDbHelper;
+import com.migafgarcia.redditimagedownloader.model.Link;
+import com.migafgarcia.redditimagedownloader.model.Resolution;
 import com.migafgarcia.redditimagedownloader.presenters.PreviewPresenter;
 import com.migafgarcia.redditimagedownloader.presenters.PreviewScreen;
-import com.migafgarcia.redditimagedownloader.reddit_json.Post;
-import com.migafgarcia.redditimagedownloader.reddit_json.Resolution;
 import com.squareup.picasso.Picasso;
 import com.tonyodev.fetch.Fetch;
 import com.tonyodev.fetch.listener.FetchListener;
@@ -65,11 +63,9 @@ public class PreviewActivity extends AppCompatActivity implements PreviewScreen,
 
     private ProgressBar progressBar;
 
-    private Post mPost;
+    private Link mPost;
 
     private PreviewPresenter previewPresenter;
-
-    private DownloadsDbHelper helper;
 
     private Fetch fetch;
 
@@ -91,12 +87,11 @@ public class PreviewActivity extends AppCompatActivity implements PreviewScreen,
 
         fetch = app.getFetch();
 
-        helper = new DownloadsDbHelper(getApplicationContext());
         previewPresenter = new PreviewPresenter();
         Bundle b = getIntent().getBundleExtra("bundle");
         mPost = b.getParcelable("Post");
 
-        filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/RedditImageDownloader/" + Uri.parse(mPost.getData().getUrl()).getLastPathSegment();
+        filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/RedditImageDownloader/" + Uri.parse(mPost.getUrl()).getLastPathSegment();
 
         loadPreview();
 
@@ -146,7 +141,7 @@ public class PreviewActivity extends AppCompatActivity implements PreviewScreen,
 
     private void enqueueDownload() {
 
-        String url = mPost.getData().getUrl();
+        String url = mPost.getUrl();
 
         Request request = new Request(url, filePath);
 
@@ -165,7 +160,7 @@ public class PreviewActivity extends AppCompatActivity implements PreviewScreen,
     }
 
     private void loadPreview() {
-        List<Resolution> resolutions = mPost.getData().getPreview().getImages().get(0).getResolutions();
+        List<Resolution> resolutions = mPost.getPreview().getImages().get(0).getResolutions();
         int currentWidth = 0;
         Resolution current = resolutions.get(0);
 
@@ -173,12 +168,8 @@ public class PreviewActivity extends AppCompatActivity implements PreviewScreen,
             if (res.getWidth() > currentWidth)
                 current = res;
 
-        // TODO: 18-08-2017 find alternative non-deprecated function
-        String url = Html.fromHtml(current.getUrl()).toString();
-
-
         // TODO: 23-08-2017 load the same preview that was loaded in MainActivity due to animation
-        Picasso.with(getApplicationContext()).load(url).into(mZoomageView);
+        Picasso.with(getApplicationContext()).load(current.getUrl()).into(mZoomageView);
     }
 
     @Override
@@ -256,13 +247,13 @@ public class PreviewActivity extends AppCompatActivity implements PreviewScreen,
 
     @Override
     public void goToThread() {
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.reddit.com" + mPost.getData().getPermalink()));
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.reddit.com" + mPost.getPermalink()));
         startActivity(intent);
     }
 
     @Override
     public void goToSubreddit() {
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.reddit.com/r/" + mPost.getData().getSubreddit()));
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.reddit.com/r/" + mPost.getSubreddit()));
         startActivity(intent);
     }
 
@@ -290,7 +281,7 @@ public class PreviewActivity extends AppCompatActivity implements PreviewScreen,
         Intent i = new Intent(Intent.ACTION_SEND);
         i.setType("text/plain");
         i.putExtra(Intent.EXTRA_SUBJECT, "Sharing URL");
-        i.putExtra(Intent.EXTRA_TEXT, mPost.getData().getUrl());
+        i.putExtra(Intent.EXTRA_TEXT, mPost.getUrl());
         startActivity(Intent.createChooser(i, "Share URL"));
     }
 
