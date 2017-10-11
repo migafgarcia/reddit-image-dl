@@ -87,11 +87,6 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
 
         deleteDownloads();
 
-        ActionBar ab = getSupportActionBar();
-        if (ab != null) {
-            ab.setDisplayShowTitleEnabled(false);
-            getSupportActionBar().setIcon(R.mipmap.ic_launcher);
-        }
     }
 
     private void initRecyclerView() {
