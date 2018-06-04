@@ -8,9 +8,16 @@ android {
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+    buildTypes {
+        release {
+            buildConfigField 'String', "RedditApiKey", RedditApiKey
+        }
+        debug {
+            buildConfigField 'String', "RedditApiKey", RedditApiKey
+        }
 
+    }
 
 }
 
@@ -18,5 +25,8 @@ dependencies {
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support.constraint:constraint-layout:1.1.0'
     implementation 'com.android.support:design:27.1.1'
-//    implementation 'com.github.jreddit:jreddit:1.0.3'
+    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.squareup.retrofit2:retrofit:2.4.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
+
 }
