@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/reddit-image-dl.iml" filepath="$PROJECT_DIR$/reddit-image-dl.iml" />
       <module fileurl="file://$PROJECT_DIR$/reddit-image-dl.iml" filepath="$PROJECT_DIR$/reddit-image-dl.iml" />
+      <module fileurl="file://$PROJECT_DIR$/reddit-model/reddit-model.iml" filepath="$PROJECT_DIR$/reddit-model/reddit-model.iml" />
     </modules>
   </component>
 </project>
