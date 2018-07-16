@@ -169,7 +169,7 @@ public class PreviewActivity extends AppCompatActivity implements PreviewScreen,
                 current = res;
 
         // TODO: 23-08-2017 load the same preview that was loaded in MainActivity due to animation
-        Picasso.with(getApplicationContext()).load(current.getUrl()).into(mZoomageView);
+        Picasso.get().load(current.getUrl()).into(mZoomageView);
     }
 
     @Override

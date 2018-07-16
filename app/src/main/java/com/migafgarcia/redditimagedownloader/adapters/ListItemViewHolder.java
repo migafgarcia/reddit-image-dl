@@ -9,8 +9,6 @@ import com.migafgarcia.redditimagedownloader.R;
 
 class ListItemViewHolder extends RecyclerView.ViewHolder {
 
-    public static final String TAG = ListItemViewHolder.class.getName();
-
     final TextView title;
     final TextView subreddit;
     final TextView user;

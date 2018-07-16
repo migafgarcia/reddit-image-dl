@@ -70,24 +70,19 @@ public class ListAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
 
             Log.d(TAG, "Position: " + position + ", " + current.getWidth() + "x" + current.getHeight());
 
-            Picasso.with(context).
+            Picasso.get().
                     load(current.getUrl()).
                     placeholder(R.color.cardview_dark_background).
                     into(holder.preview);
         }
         else {
-            Picasso.with(context).
+            Picasso.get().
                     load(post.getThumbnail()).
                     placeholder(R.color.cardview_dark_background).
                     into(holder.preview);
         }
 
-        holder.preview.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                itemClickCallback.onItemClick(post);
-            }
-        });
+        holder.preview.setOnClickListener(view -> itemClickCallback.onItemClick(post));
 
     }
 

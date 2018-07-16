@@ -1,70 +1,91 @@
 package com.migafgarcia.redditimagedownloader;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
+import android.arch.persistence.room.Dao;
+import android.arch.persistence.room.Room;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
-import com.j256.ormlite.dao.Dao;
-import com.j256.ormlite.dao.DaoManager;
-import com.migafgarcia.redditimagedownloader.db.DatabaseManager;
-import com.migafgarcia.redditimagedownloader.db.SubredditOperation;
-import com.migafgarcia.redditimagedownloader.model.Subreddit;
-import com.migafgarcia.redditimagedownloader.model.Thing;
-import com.migafgarcia.redditimagedownloader.services.RedditApi;
+import com.migafgarcia.redditimagedownloader.adapters.SubredditsListAdapter;
+import com.migafgarcia.redditimagedownloader.db.AppDatabase;
+import com.migafgarcia.redditimagedownloader.db.SubredditData;
+import com.migafgarcia.redditimagedownloader.db.SubredditsViewModel;
 
-import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import java.util.Collection;
 
 public class SubredditActivity extends AppCompatActivity {
 
     private static final String TAG = SubredditActivity.class.getName();
-    private SubredditOperation operation;
 
-    private Subreddit query;
+    private static final String subredditNameRegex = "[A-Za-z0-9][A-Za-z0-9_]{2,20}";
+
+    private AppDatabase appDatabase;
+    private RecyclerView recyclerView;
+    private SubredditsListAdapter adapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_subreddit);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar.setTitle("Manage Subreddits");
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(view -> showAddDialog());
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        DatabaseManager.init(this);
-        operation = new SubredditOperation(this);
+        appDatabase = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "reddit-image-dl").build();
 
-        new RedditApi().getService().getSubredditInfo("pics").enqueue(new Callback<Thing>() {
-            @Override
-            public void onResponse(Call<Thing> call, Response<Thing> response) {
-                Subreddit subreddit = (Subreddit) response.body().getData();
-                operation.create(subreddit);
+        recyclerView = findViewById(R.id.subreddits_recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+
+        adapter = new SubredditsListAdapter();
+
+        recyclerView.setAdapter(adapter);
+
+        ViewModelProviders.of(this)
+                .get(SubredditsViewModel.class)
+                .getSubredditsLiveData(appDatabase.getSubredditDataDao())
+                .observe(this, subredditData -> adapter.update(subredditData));
+    }
+
+    private void showAddDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Add subreddit");
+
+        LayoutInflater inflater = getLayoutInflater();
+
+        View v = inflater.inflate(R.layout.add_subreddit, null);
+        Button add = v.findViewById(R.id.add_btn);
+        EditText editText = v.findViewById(R.id.subreddit_editText);
+        add.setOnClickListener(view -> {
+            String input = editText.getText().toString();
+            if(input.matches(subredditNameRegex)) {
+                appDatabase.getSubredditDataDao().insert(new SubredditData(input));
             }
-
-            @Override
-            public void onFailure(Call<Thing> call, Throwable t) {
-
+            else {
+                Toast.makeText(SubredditActivity.this, "Subreddit name not allowed", Toast.LENGTH_SHORT).show();
             }
         });
 
-        for(Subreddit s : (List<Subreddit>)(List<?>) operation.findAll()) {
-            Log.d(TAG, s.toString());
-        }
+        builder.setView(v);
+        builder.show();
+
 
     }
 
