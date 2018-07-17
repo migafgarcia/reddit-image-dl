@@ -15,7 +15,7 @@ public class SubredditsViewModel extends ViewModel {
 
     public LiveData<List<SubredditData>> getSubredditsLiveData(SubredditDataDao dao) {
         if(subredditsLiveData == null) {
-            subredditsLiveData = dao.getSubreddits();
+            subredditsLiveData = dao.getLiveSubreddits();
         }
         return subredditsLiveData;
     }

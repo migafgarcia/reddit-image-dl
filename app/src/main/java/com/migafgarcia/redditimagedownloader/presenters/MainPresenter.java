@@ -1,7 +1,14 @@
 package com.migafgarcia.redditimagedownloader.presenters;
 
+import android.arch.lifecycle.LiveData;
+import android.util.Log;
+
+import com.migafgarcia.redditimagedownloader.db.AppDatabase;
+import com.migafgarcia.redditimagedownloader.db.SubredditData;
 import com.migafgarcia.redditimagedownloader.model.Thing;
 import com.migafgarcia.redditimagedownloader.services.RedditApi;
+
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -12,20 +19,30 @@ public class MainPresenter {
     private static final String TAG = MainPresenter.class.getName();
     private final MainScreen mainScreen;
     private final RedditApi redditApi;
+    private final AppDatabase appDatabase;
 
-    private final String multireddit = "oldschoolcool+thewaywewere+pic+pics+AbandonedPorn+EarthPorn+MilitaryPorn+BotanicalPorn+waterporn+SeaPorn+SkyPorn+FirePorn+DesertPorn+WinterPorn+AutumnPorn+WeatherPorn+GeologyPorn+SpacePorn+BeachPorn+MushroomPorn+SpringPorn+SummerPorn+LavaPorn+LakePorn+CityPorn+VillagePorn+RuralPorn+ArchitecturePorn+HousePorn+CabinPorn+ChurchPorn+AbandonedPorn+CemeteryPorn+InfrastructurePorn+MachinePorn+CarPorn+F1Porn+MotorcyclePorn+MilitaryPorn+GunPorn+KnifePorn+BoatPorn+RidesPorn+DestructionPorn+ThingsCutInHalfPorn+StarshipPorn+ToolPorn+TechnologyPorn+BridgePorn+PolicePorn+SteamPorn+RetailPorn+SpaceFlightPorn+roadporn+drydockporn+AnimalPorn+HumanPorn+EarthlingPorn+AdrenalinePorn+ClimbingPorn+SportsPorn+AgriculturePorn+TeaPorn+BonsaiPorn+FoodPorn+CulinaryPorn+DessertPorn+DesignPorn+RoomPorn+AlbumArtPorn+MetalPorn+MoviePosterPorn+TelevisionPosterPorn+ComicBookPorn+StreetArtPorn+AdPorn+ArtPorn+FractalPorn+InstrumentPorn+ExposurePorn+MacroPorn+MicroPorn+GeekPorn+MTGPorn+GamerPorn+PowerWashingPorn+AerialPorn+OrganizationPorn+FashionPorn+AVPorn+ApocalypsePorn+InfraredPorn+ViewPorn+HellscapePorn+sculptureporn+HistoryPorn+UniformPorn+BookPorn+NewsPorn+QuotesPorn+FuturePorn+FossilPorn+MegalithPorn+ArtefactPorn+wallpaper+wallpapers+iWallpaper+Verticalwallpapers";
+    private String multireddit;
 
 
-    public MainPresenter(MainScreen mainScreen, RedditApi redditApi) {
+    public MainPresenter(MainScreen mainScreen, RedditApi redditApi, AppDatabase appDatabase) {
         this.mainScreen = mainScreen;
         this.redditApi = redditApi;
+        this.appDatabase = appDatabase;
     }
 
     public void getPosts() {
 
         mainScreen.showLoading();
 
-        // TODO: 21-08-2017 fetch subreddits from sqlite
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (SubredditData data : appDatabase.getSubredditDataDao().getSubreddits()) {
+            stringBuilder.append(data.name);
+            stringBuilder.append('+');
+        }
+        stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+        multireddit = stringBuilder.toString();
+
         redditApi.getService().getList(multireddit).enqueue(new Callback<Thing>() {
             @Override
             public void onResponse(Call<Thing> call, Response<Thing> response) {

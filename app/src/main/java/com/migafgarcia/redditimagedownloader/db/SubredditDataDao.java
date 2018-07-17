@@ -26,7 +26,9 @@ public interface SubredditDataDao {
     void delete(SubredditData subredditData);
 
     @Query("SELECT * FROM subredditdata")
-    LiveData<List<SubredditData>> getSubreddits();
+    LiveData<List<SubredditData>> getLiveSubreddits();
 
+    @Query("SELECT * FROM subredditdata")
+    List<SubredditData> getSubreddits();
 
 }

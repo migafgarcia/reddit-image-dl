@@ -6,6 +6,7 @@ import android.arch.persistence.db.SupportSQLiteDatabase;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -21,6 +22,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.migafgarcia.redditimagedownloader.adapters.OnSubredditClickListener;
 import com.migafgarcia.redditimagedownloader.adapters.SubredditsListAdapter;
 import com.migafgarcia.redditimagedownloader.db.AppDatabase;
 import com.migafgarcia.redditimagedownloader.db.SubredditData;
@@ -61,16 +63,30 @@ public class SubredditActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.subreddits_recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
 
-        adapter = new SubredditsListAdapter();
+        adapter = new SubredditsListAdapter(this::showDeleteDialog);
 
         recyclerView.setAdapter(adapter);
-
-
 
         ViewModelProviders.of(this)
                 .get(SubredditsViewModel.class)
                 .getSubredditsLiveData(appDatabase.getSubredditDataDao())
                 .observe(this, subredditData -> adapter.update(subredditData));
+    }
+
+    private void showDeleteDialog(SubredditData subredditData) {
+        DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+            switch (which){
+                case DialogInterface.BUTTON_POSITIVE:
+                    new Thread(() -> appDatabase.getSubredditDataDao().delete(subredditData)).start();
+                    break;
+            }
+        };
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Delete " + subredditData.name + "?");
+        builder.setPositiveButton("Yes", dialogClickListener);
+        builder.setNegativeButton("No", dialogClickListener);
+        builder.show();
     }
 
     private void showAddDialog() {

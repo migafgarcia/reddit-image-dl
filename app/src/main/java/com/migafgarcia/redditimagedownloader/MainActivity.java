@@ -63,19 +63,21 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
     private AppDatabase appDatabase;
 
     private static final int OPEN_SETTINGS_ACTIVITY = 1;
+    private static final int OPEN_MANAGE_SUBREDDITS_ACTIVITY = 2;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        appDatabase = Room
+                .databaseBuilder(getApplicationContext(), AppDatabase.class, "reddit-image-dl")
+                .allowMainThreadQueries()
+                .build();
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         if (!prefs.getBoolean("firstTime", false)) {
-
-            AppDatabase appDatabase = Room
-                    .databaseBuilder(getApplicationContext(), AppDatabase.class, "reddit-image-dl")
-                    .build();
 
             new Thread(() -> {
                 for (String subreddit : SubredditDataDao.DEFAULT_SUBREDDITS)
@@ -88,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
         }
 
 
-        mMainPresenter = new MainPresenter(this, new RedditApi());
+        mMainPresenter = new MainPresenter(this, new RedditApi(), appDatabase);
 
         setSupportActionBar(mToolbar);
 
@@ -189,7 +191,7 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
 
     @Override
     public void launchManageSubreddits() {
-        startActivity(new Intent(getApplicationContext(), SubredditActivity.class));
+        startActivityForResult(new Intent(getApplicationContext(), SubredditActivity.class), OPEN_MANAGE_SUBREDDITS_ACTIVITY);
     }
 
     @Override
@@ -214,6 +216,9 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == OPEN_SETTINGS_ACTIVITY) {
+            mListAdapter.reprocessPosts();
+        }
+        else if(requestCode == OPEN_MANAGE_SUBREDDITS_ACTIVITY) {
             mListAdapter.reprocessPosts();
         }
     }
