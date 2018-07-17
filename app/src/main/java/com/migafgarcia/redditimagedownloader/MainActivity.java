@@ -1,9 +1,15 @@
 package com.migafgarcia.redditimagedownloader;
 
+import android.arch.persistence.db.SupportSQLiteDatabase;
+import android.arch.persistence.room.Room;
+import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -22,6 +28,9 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.migafgarcia.redditimagedownloader.adapters.ListAdapter;
+import com.migafgarcia.redditimagedownloader.db.AppDatabase;
+import com.migafgarcia.redditimagedownloader.db.SubredditData;
+import com.migafgarcia.redditimagedownloader.db.SubredditDataDao;
 import com.migafgarcia.redditimagedownloader.model.Link;
 import com.migafgarcia.redditimagedownloader.model.Thing;
 import com.migafgarcia.redditimagedownloader.presenters.MainPresenter;
@@ -51,6 +60,8 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
 
     private ListAdapter mListAdapter;
 
+    private AppDatabase appDatabase;
+
     private static final int OPEN_SETTINGS_ACTIVITY = 1;
 
     @Override
@@ -58,6 +69,24 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        if (!prefs.getBoolean("firstTime", false)) {
+
+            AppDatabase appDatabase = Room
+                    .databaseBuilder(getApplicationContext(), AppDatabase.class, "reddit-image-dl")
+                    .build();
+
+            new Thread(() -> {
+                for (String subreddit : SubredditDataDao.DEFAULT_SUBREDDITS)
+                    appDatabase.getSubredditDataDao().insert(new SubredditData(subreddit));
+            }).start();
+
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putBoolean("firstTime", true);
+            editor.apply();
+        }
+
 
         mMainPresenter = new MainPresenter(this, new RedditApi());
 
@@ -74,18 +103,13 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
 
         mFloatingActionButton.bringToFront();
 
-        mSwipeRefreshLayout.setOnRefreshListener(
-                new SwipeRefreshLayout.OnRefreshListener() {
-                    @Override
-                    public void onRefresh() {
-                        mMainPresenter.getPosts();
-                    }
-                }
-        );
+        mSwipeRefreshLayout.setOnRefreshListener(() -> mMainPresenter.getPosts());
 
         mMainPresenter.getPosts();
 
         deleteDownloads();
+
+
 
     }
 
@@ -96,19 +120,9 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        ListAdapter.ItemClickCallback itemClickCallback = new ListAdapter.ItemClickCallback() {
-            @Override
-            public void onItemClick(Link post) {
-                launchPreview(post);
-            }
-        };
+        ListAdapter.ItemClickCallback itemClickCallback = this::launchPreview;
 
-        ListAdapter.MorePostsCallback morePostsCallback = new ListAdapter.MorePostsCallback() {
-            @Override
-            public void onMorePosts(String after) {
-                mMainPresenter.morePosts(after);
-            }
-        };
+        ListAdapter.MorePostsCallback morePostsCallback = after -> mMainPresenter.morePosts(after);
 
         mListAdapter = new ListAdapter(getApplicationContext(), itemClickCallback, morePostsCallback);
         mRecyclerView.setAdapter(mListAdapter);
@@ -180,16 +194,13 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
 
     @Override
     public void clearDownloads() {
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case DialogInterface.BUTTON_POSITIVE:
-                        deleteDownloads();
-                        break;
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        break;
-                }
+        DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+            switch (which) {
+                case DialogInterface.BUTTON_POSITIVE:
+                    deleteDownloads();
+                    break;
+                case DialogInterface.BUTTON_NEGATIVE:
+                    break;
             }
         };
 

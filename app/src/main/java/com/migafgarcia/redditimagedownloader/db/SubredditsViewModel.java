@@ -3,7 +3,6 @@ package com.migafgarcia.redditimagedownloader.db;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModel;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -16,7 +15,7 @@ public class SubredditsViewModel extends ViewModel {
 
     public LiveData<List<SubredditData>> getSubredditsLiveData(SubredditDataDao dao) {
         if(subredditsLiveData == null) {
-            subredditsLiveData = dao.getLiveSubreddits();
+            subredditsLiveData = dao.getSubreddits();
         }
         return subredditsLiveData;
     }

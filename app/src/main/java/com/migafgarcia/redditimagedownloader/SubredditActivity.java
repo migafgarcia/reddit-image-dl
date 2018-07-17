@@ -2,9 +2,12 @@ package com.migafgarcia.redditimagedownloader;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.arch.persistence.db.SupportSQLiteDatabase;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Room;
+import android.arch.persistence.room.RoomDatabase;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
@@ -21,8 +24,10 @@ import android.widget.Toast;
 import com.migafgarcia.redditimagedownloader.adapters.SubredditsListAdapter;
 import com.migafgarcia.redditimagedownloader.db.AppDatabase;
 import com.migafgarcia.redditimagedownloader.db.SubredditData;
+import com.migafgarcia.redditimagedownloader.db.SubredditDataDao;
 import com.migafgarcia.redditimagedownloader.db.SubredditsViewModel;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 public class SubredditActivity extends AppCompatActivity {
@@ -49,7 +54,9 @@ public class SubredditActivity extends AppCompatActivity {
         fab.setOnClickListener(view -> showAddDialog());
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        appDatabase = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "reddit-image-dl").build();
+        appDatabase = Room
+                .databaseBuilder(getApplicationContext(), AppDatabase.class, "reddit-image-dl")
+                .build();
 
         recyclerView = findViewById(R.id.subreddits_recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
@@ -57,6 +64,8 @@ public class SubredditActivity extends AppCompatActivity {
         adapter = new SubredditsListAdapter();
 
         recyclerView.setAdapter(adapter);
+
+
 
         ViewModelProviders.of(this)
                 .get(SubredditsViewModel.class)
@@ -73,18 +82,23 @@ public class SubredditActivity extends AppCompatActivity {
         View v = inflater.inflate(R.layout.add_subreddit, null);
         Button add = v.findViewById(R.id.add_btn);
         EditText editText = v.findViewById(R.id.subreddit_editText);
+        builder.setView(v);
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+
         add.setOnClickListener(view -> {
             String input = editText.getText().toString();
             if(input.matches(subredditNameRegex)) {
-                appDatabase.getSubredditDataDao().insert(new SubredditData(input));
+                new Thread(() -> appDatabase.getSubredditDataDao().insert(new SubredditData(input))).start();
+                alertDialog.cancel();
             }
             else {
                 Toast.makeText(SubredditActivity.this, "Subreddit name not allowed", Toast.LENGTH_SHORT).show();
             }
         });
 
-        builder.setView(v);
-        builder.show();
+
 
 
     }
